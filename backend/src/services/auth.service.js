@@ -30,7 +30,7 @@ export const login = async ({ email, password }) => {
 
     const { password: _, ...userWithoutPassword } = user;
 
-    const tokens = generateTokens(user.id);
+    const tokens = generateTokens(userWithoutPassword);
 
     await authRepo.saveRefreshToken({ userId: user.id, token: tokens.refreshToken });
 
