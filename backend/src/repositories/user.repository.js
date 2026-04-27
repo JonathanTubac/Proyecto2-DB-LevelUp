@@ -20,6 +20,16 @@ export const findById = async (id) => {
     return rows[0]
 }
 
+export const findByEmail = async (email) => {
+    const {rows} = await pool.query(`
+        SELECT *
+        FROM usuarios
+        WHERE email = $1
+    `, [email])
+
+    return rows[0];
+}
+
 export const create = async ({ name, email, password, phone, role_id }) => {
     const { rows } = await pool.query(`
         INSERT INTO usuarios(nombre, correo, password, telefono, role_id)

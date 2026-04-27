@@ -1,9 +1,32 @@
 import express from 'express'
 import 'dotenv/config'
 import { connect } from './config/db.js'
+import userRouters from './routes/user.routes.js'
+import errorMiddleware from './middlewares/error.middleware.js'
 
 const app = express()
 const port = process.env.PORT || 3000
+
+app.use(express.json());
+app.use(express.urlencoded({ extended: true }));
+
+app.get('/health', (req, res) => {
+    res.json({ status: 'ok', timestamp: new Date() })
+})
+
+app.use('/api/v1/users', userRouters);
+
+app.use((req, res) => {
+    res.status(404).json({
+        success: false,
+        error: {
+            code: 'NOT_FOUND',
+            message: `route ${req.method} ${req.url} doesnt exist!`
+        }
+    })
+})
+
+app.use(errorMiddleware)
 
 await connect()
 
