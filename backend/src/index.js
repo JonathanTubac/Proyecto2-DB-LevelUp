@@ -2,6 +2,8 @@ import express from 'express'
 import 'dotenv/config'
 import { connect } from './config/db.js'
 import userRouters from './routes/user.routes.js'
+import authRoutes from './routes/auth.routes.js'
+
 import errorMiddleware from './middlewares/error.middleware.js'
 
 const app = express()
@@ -15,6 +17,7 @@ app.get('/health', (req, res) => {
 })
 
 app.use('/api/v1/users', userRouters);
+app.use('/api/v1/auth', authRoutes);
 
 app.use((req, res) => {
     res.status(404).json({

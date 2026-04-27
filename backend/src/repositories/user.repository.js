@@ -12,9 +12,9 @@ export const findAll = async () => {
 
 export const findById = async (id) => {
     const { rows } = await pool.query(`
-        SELECT *
-        FROM usuarios
-        WHERE id = $1
+        SELECT u.id, u.nombre, u.correo, u.telefono, u.activo, TRIM(r.nombre) AS rol
+        FROM usuarios u JOIN roles r ON u.id_rol = r.id
+        WHERE u.id = $1
     `, [id])
 
     return rows[0]
@@ -24,7 +24,7 @@ export const findByEmail = async (email) => {
     const {rows} = await pool.query(`
         SELECT *
         FROM usuarios
-        WHERE email = $1
+        WHERE correo = $1
     `, [email])
 
     return rows[0];
@@ -32,9 +32,9 @@ export const findByEmail = async (email) => {
 
 export const create = async ({ name, email, password, phone, role_id }) => {
     const { rows } = await pool.query(`
-        INSERT INTO usuarios(nombre, correo, password, telefono, role_id)
-        VALUES ($1, $2, $3, $4)
-        RETURNING id, nombre, correo, telefono
+        INSERT INTO usuarios(nombre, correo, password, telefono, id_rol)
+        VALUES ($1, $2, $3, $4, $5)
+        RETURNING id, nombre, correo, telefono, id_rol
     `, [name, email, password, phone, role_id]);
 
     return rows[0] ?? null

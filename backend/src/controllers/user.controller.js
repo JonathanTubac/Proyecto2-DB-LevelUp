@@ -20,7 +20,7 @@ export const getById = async (req, res, next) => {
 
 export const create = async (req, res, next) => {
     try {
-        const { name, email, password, phone } = req.body;
+        const { name, email, password, phone, role_id } = req.body;
         const user = await userService.registerUser({ name, email, password, phone });
         res.status(201).json({ success: true, data: user })
     } catch (err) {

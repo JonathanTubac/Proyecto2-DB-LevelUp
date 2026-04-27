@@ -1,7 +1,8 @@
 export default (err, req, res, next) => {
+    console.log(err)
     const status = err.statusCode || 500;
 
-    req.status(status).json({
+    res.status(status).json({
         success: false,
         error: {
             code: err.code || 'SERVER_ERROR',
