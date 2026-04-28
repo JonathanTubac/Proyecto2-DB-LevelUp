@@ -19,7 +19,7 @@ export const findById = async (id) => {
 export const create = async ({name}) => {
     const {rows} = await pool.query(`
         INSERT INTO categorias (nombre) 
-        VALUES $1
+        VALUES ($1)
         RETURNING * 
     `, [name]);
 
@@ -28,8 +28,9 @@ export const create = async ({name}) => {
 
 export const update = async (id, {name}) => {
     const {rows} = await pool.query(`
-        UPDATE productos
+        UPDATE categorias
         SET nombre = $1
-        WHERE id = $2    
+        WHERE id = $2  
+        RETURNING *  
     `, [name, id])
 }
