@@ -17,7 +17,7 @@ export const rechargeWallet = async (userId, amount) => {
     const wallet = await walletRepository.findByUserId(userId);
     if (!wallet) throw new NotFoundError('Wallet not found!');
 
-    return await walletRepository.recharge(userId, amount);
+    return await walletRepository.recharge(amount, userId);
 }
 
 export const purchaseWallet = async (userId, amount) => {
@@ -26,7 +26,7 @@ export const purchaseWallet = async (userId, amount) => {
     const wallet = await walletRepository.findByUserId(userId);
     if (!wallet) throw new NotFoundError('Wallet not found!');
 
-    const updated = await walletRepository.purchase(userId, amount);
+    const updated = await walletRepository.purchase(amount, userId);
     if (!updated) throw new ValidationError('Cant afford!');
 
     return updated;

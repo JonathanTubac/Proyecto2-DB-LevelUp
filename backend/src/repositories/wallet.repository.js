@@ -1,9 +1,8 @@
-import { use } from "react";
 import { pool, withTransaction } from "../config/db.js";
 
 export const findAll = async () => {
     const { rows } = await pool.query(`
-        SELECT * FROM billeteras b
+        SELECT b.id, b.monto, b.fecha_creacion, u.nombre FROM billeteras b
         JOIN usuarios u ON b.id_usuario = u.id
         WHERE u.activo = true
     `)
@@ -13,7 +12,7 @@ export const findAll = async () => {
 
 export const findByUserId = async (userId) => {
     const {rows} = await pool.query(`
-        SELECT * FROM billeteras b 
+        SELECT b.id, b.monto, b.fecha_creacion, u.nombre FROM billeteras b 
         JOIN usuarios u ON b.id_usuario = u.id
         WHERE u.id = $1
     `, [userId]);
@@ -27,14 +26,14 @@ export const update = async (user_id) => {
     `)
 }
 
-export const recharge = async (amount, user_id) => {
+export const recharge = async (amount, userId) => {
     return await withTransaction(async (client) => {
         const {rows} = await client.query(`
             UPDATE billeteras
             SET monto = monto + $1
             WHERE id_usuario = $2
             RETURNING id, id_usuario, monto
-        `, [amount, user_id]);
+        `, [amount, userId]);
 
         if (!rows[0]) return null
 

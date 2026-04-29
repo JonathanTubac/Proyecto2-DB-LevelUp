@@ -25,6 +25,6 @@ export const protect = async (req, res, next) => {
 
 export const authorize = (...roles) => (req, res, next) => {
     if (!roles.includes(req.user.rol))
-    return next(new ForbiddenError('You dont have authorization for that'));
+        return next(new ForbiddenError('You dont have authorization for that'));
     next();
 }

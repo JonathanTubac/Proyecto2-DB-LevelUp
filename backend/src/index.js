@@ -3,6 +3,7 @@ import 'dotenv/config'
 import { connect } from './config/db.js'
 import userRouters from './routes/user.routes.js'
 import authRoutes from './routes/auth.routes.js'
+import walletRoutes from './routes/wallet.routes.js'
 
 import errorMiddleware from './middlewares/error.middleware.js'
 
@@ -18,6 +19,7 @@ app.get('/health', (req, res) => {
 
 app.use('/api/v1/users', userRouters);
 app.use('/api/v1/auth', authRoutes);
+app.use('/api/v1/wallets', walletRoutes);
 
 app.use((req, res) => {
     res.status(404).json({
