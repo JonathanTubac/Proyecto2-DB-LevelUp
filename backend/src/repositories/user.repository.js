@@ -2,8 +2,8 @@ import { pool } from "../config/db.js";
 
 export const findAll = async () => {
     const { rows } = await pool.query(`
-        SELECT id, nombre, correo, telefono, id_rol 
-        FROM usuarios
+        SELECT u.id, u.nombre, u.correo, u.telefono, u.activo, TRIM(r.nombre) AS rol
+        FROM usuarios u JOIN roles r ON u.id_rol = r.id
         WHERE activo = true
     `)
 
