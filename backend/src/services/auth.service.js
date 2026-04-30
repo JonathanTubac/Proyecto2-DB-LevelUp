@@ -12,7 +12,7 @@ export const register = async ({ name, email, password, phone, role_id }) => {
 
     const user = await userRepo.create({ name, email, password: hashed, phone, role_id });
 
-    const tokens = generateTokens(user.id)
+    const tokens = generateTokens(user)
 
     await authRepo.saveRefreshToken({ userId: user.id, token: tokens.refreshToken });
 

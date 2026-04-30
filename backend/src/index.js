@@ -5,6 +5,7 @@ import userRouters from './routes/user.routes.js'
 import authRoutes from './routes/auth.routes.js'
 import producRoutes from './routes/product.routes.js'
 import categoryRoutes from './routes/category.routes.js'
+import walletRoutes from './routes/wallet.routes.js'
 
 import errorMiddleware from './middlewares/error.middleware.js'
 
@@ -22,6 +23,7 @@ app.use('/api/v1/users', userRouters);
 app.use('/api/v1/auth', authRoutes);
 app.use('/api/v1/products', producRoutes);
 app.use('/api/v1/categories', categoryRoutes);
+app.use('/api/v1/wallets', walletRoutes);
 
 app.use((req, res) => {
     res.status(404).json({
