@@ -5,6 +5,24 @@ export const getWallets = async () => {
     return await walletRepository.findAll();
 }
 
+export const getWalletById = async (id) => {
+    const wallet = await walletRepository.findById(id);
+    if(!wallet) throw new NotFoundError('Wallet not found!');
+
+    return wallet;
+}
+
+export const updateWallet = async (amount, id) => {
+    if (amount <= 0) throw new ValidationError('Amount must be greater than 0');
+
+    const wallet = await walletRepository.findById(id);
+    if(!wallet) throw new NotFoundError('Wallet not found!');
+
+    const updated = await walletRepository.updateById(amount, id);
+    
+    return updated;
+}
+
 export const getMyWallet = async (userId) => {
     const wallet = await walletRepository.findByUserId(userId);
     if (!wallet) throw new NotFoundError('Wallet not found!');

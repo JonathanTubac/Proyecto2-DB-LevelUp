@@ -10,6 +10,16 @@ export const findAll = async () => {
     return rows
 };
 
+export const findById = async (id) => {
+    const {rows} = await pool.query(`
+        SELECT b.id, b.monto, b.fecha_creacion, u.nombre FROM billeteras b
+        JOIN usuarios u ON b.id_usuario = u.id
+        WHERE u.id = $1 AND u.activo = true 
+    `, [id]);
+
+    return rows[0];
+}
+
 export const findByUserId = async (userId) => {
     const {rows} = await pool.query(`
         SELECT b.id, b.monto, b.fecha_creacion, u.nombre FROM billeteras b 
@@ -20,10 +30,15 @@ export const findByUserId = async (userId) => {
     return rows[0]
 };
 
-export const update = async (user_id) => {
+export const updateById = async (amount, id) => {
     const {rows} = await pool.query(`
-        UPDATE 
-    `)
+        UPDATE billeteras
+        SET monto = $1
+        WHERE id_usuario = $2
+        RETURNING id, id_usuario, monto
+    `, [amount, id]);
+
+    return rows[0]
 }
 
 export const recharge = async (amount, userId) => {
