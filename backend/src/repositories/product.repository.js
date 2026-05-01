@@ -2,7 +2,7 @@ import { pool } from "../config/db.js";
 
 export const findAll = async () => {
   const { rows } = await pool.query(`
-        SELECT p.id, p.nombre, p.precio, p.stock, c.nombre AS categoria
+        SELECT p.id, p.nombre, p.precio, p.stock, c.nombre AS categoria, p.activo
         FROM productos p
         JOIN categorias c ON p.id_categoria = c.id
         WHERE p.activo = true
@@ -60,12 +60,12 @@ export const deactivate = async (id) => {
     return rows[0]
 };
 
-export const decreaseStock = async (id, cantidad) => {
-  const {rows} = await pool.query(`
+export const decreaseStock = async (client, id, cantidad) => {
+  const {rows} = await client.query(`
     UPDATE productos
     SET stock = stock - $1
     WHERE id = $2 AND stock >= $1
-    RETURNING id, nombre, stock  
+    RETURNING id, nombre, stock
   `, [cantidad, id]);
 
   return rows[0] ?? null

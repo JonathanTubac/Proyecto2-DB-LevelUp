@@ -83,9 +83,12 @@ export const purchaseWithCompra = async (client, userId, amount, id_compra) => {
     await client.query(`
       UPDATE movimientos
       SET id_compra = $1
-      WHERE id_billetera = $2
-      ORDER BY fecha DESC
-      LIMIT 1
+      WHERE id = (
+        SELECT id FROM movimientos
+        WHERE id_billetera = $2
+        ORDER BY fecha DESC
+        LIMIT 1
+      )
     `, [id_compra, rows[0].id]);
   }
 

@@ -1,4 +1,4 @@
-import { pool, withTransaction } from '../config/database.js';
+import { pool, withTransaction } from '../config/db.js';
 import * as compraRepo from '../repositories/compra.repository.js';
 import * as productRepo from '../repositories/product.repository.js';
 import * as walletRepo from '../repositories/wallet.repository.js';
@@ -19,7 +19,7 @@ export const createCompra = async (userId, { tipo, productos, id_empleado }) => 
         if (!product)
             throw new NotFoundError(`Product ${item.id_producto} not found!`);
 
-        if (!product.activo)
+        if (product.activo == 'false')
             throw new ValidationError(`Product ${product.nombre} is not available`);
 
         if (product.stock < item.cantidad)

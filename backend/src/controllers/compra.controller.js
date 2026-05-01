@@ -3,7 +3,7 @@ import * as compraService from '../services/compra.service.js'
 
 export const create = async (req, res, next) => {
     try {
-        const { userId } = req.user;
+        const { id: userId } = req.user;
         const { tipo, productos, id_empleado } = req.body;
         const result = await compraService.createCompra(userId, {
             tipo,
@@ -19,7 +19,7 @@ export const create = async (req, res, next) => {
 export const getById = async (req, res, next) => {
     try {
         const { id } = req.params;
-        const { userId } = req.user;
+        const { id: userId } = req.user;
         const compra = await compraService.getCompraById(id, userId);
         res.status(200).json({ success: true, data: compra });
     } catch (err) {
@@ -29,7 +29,7 @@ export const getById = async (req, res, next) => {
 
 export const getUserCompras = async (req, res, next) => {
     try {
-        const { userId } = req.user;
+        const { id: userId } = req.user;
         const compras = await compraService.getMyCompras(userId);
         res.status(200).json({ success: true, data: compras });
     } catch (err) {

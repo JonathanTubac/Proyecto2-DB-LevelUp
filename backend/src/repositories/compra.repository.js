@@ -21,7 +21,7 @@ export const createDetalle = async (client, { id_compra, id_producto, cantidad_p
 };
 
 export const findById = async (id) => {
-    return {rows} = await pool.query(`
+    const {rows} = await pool.query(`
        SELECT c.id, c.tipo, c.fecha, c.total, c.id_usuario, c.id_empleado,
        json_agg(
         json_build_object(
@@ -32,7 +32,7 @@ export const findById = async (id) => {
         )
        ) AS detalle
        FROM compras c
-       JOIN detallecompras dc ON dc.id = c.id
+       JOIN detallecompras dc ON dc.id_compra = c.id
        JOIN productos p ON p.id = dc.id_producto
        WHERE c.id = $1
        GROUP BY c.id 
