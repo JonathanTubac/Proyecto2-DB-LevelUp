@@ -59,3 +59,14 @@ export const deactivate = async (id) => {
 
     return rows[0]
 };
+
+export const decreaseStock = async (id, cantidad) => {
+  const {rows} = await pool.query(`
+    UPDATE productos
+    SET stock = stock - $1
+    WHERE id = $2 AND stock >= $1
+    RETURNING id, nombre, stock  
+  `, [cantidad, id]);
+
+  return rows[0] ?? null
+}
