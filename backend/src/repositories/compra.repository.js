@@ -1,5 +1,25 @@
 import { pool } from "../config/db.js";
 
+export const findAll = async () => {
+    const { rows } = await pool.query(`
+        SELECT c.id, c.tipo, c.fecha, c.total, c.id_usuario, c.id_empleado,
+        json_agg(
+            json_build_object(
+                'id_producto', dc.id_producto,
+                'nombre', p.nombre,
+                'cantidad', dc.cantidad_producto,
+                'precio_unitario', dc.precio_unitario
+            )
+        ) AS detalle
+        FROM compras c
+        JOIN detallecompras dc ON dc.id_compra = c.id
+        JOIN productos p ON p.id = dc.id_producto
+        GROUP BY c.id 
+    `);
+
+    return rows;
+};
+
 export const create = async (client, { tipo, total, id_usuario, id_empleado }) => {
     const { rows } = await client.query(`
        INSERT INTO compras (tipo, total, id_usuario, id_empleado)
@@ -21,7 +41,7 @@ export const createDetalle = async (client, { id_compra, id_producto, cantidad_p
 };
 
 export const findById = async (id) => {
-    const {rows} = await pool.query(`
+    const { rows } = await pool.query(`
        SELECT c.id, c.tipo, c.fecha, c.total, c.id_usuario, c.id_empleado,
        json_agg(
         json_build_object(
@@ -42,7 +62,7 @@ export const findById = async (id) => {
 };
 
 export const findByUserId = async (id_usuario) => {
-    const {rows} = await pool.query(`
+    const { rows } = await pool.query(`
         SELECT c.id, c.tipo, c.fecha, c.total,
         json_agg(
             json_build_object(

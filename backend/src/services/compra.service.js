@@ -7,6 +7,10 @@ import {
     ValidationError
 } from '../utils/errors.js';
 
+export const getCompras = async () => {
+    return await compraRepo.findAll();
+}
+
 export const createCompra = async (userId, { tipo, productos, id_empleado }) => {
     if (!productos || productos.length === 0)
         throw new ValidationError('You must send al least one product!');

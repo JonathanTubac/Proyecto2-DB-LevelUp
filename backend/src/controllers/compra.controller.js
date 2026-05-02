@@ -1,6 +1,15 @@
 import e from 'express';
 import * as compraService from '../services/compra.service.js'
 
+export const getAll = async (req, res, next) => {
+    try {
+        const compras = await compraService.getCompras();
+        res.status(200).json({success:true, data: compras});
+    } catch (err) {
+        next(err);
+    }
+}
+
 export const create = async (req, res, next) => {
     try {
         const { id: userId } = req.user;
