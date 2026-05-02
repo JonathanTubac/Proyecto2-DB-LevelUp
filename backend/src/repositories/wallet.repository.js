@@ -70,3 +70,27 @@ export const purchase = async (amount, userId) => {
         return rows[0]
     })
 }
+
+export const purchaseWithCompra = async (client, userId, amount, id_compra) => {
+  const { rows } = await client.query(`
+    UPDATE billeteras
+    SET monto = monto - $1
+    WHERE id_usuario = $2 AND monto >= $1
+    RETURNING id, id_usuario, monto
+  `, [amount, userId]);
+
+  if (rows[0]) {
+    await client.query(`
+      UPDATE movimientos
+      SET id_compra = $1
+      WHERE id = (
+        SELECT id FROM movimientos
+        WHERE id_billetera = $2
+        ORDER BY fecha DESC
+        LIMIT 1
+      )
+    `, [id_compra, rows[0].id]);
+  }
+
+  return rows[0] ?? null;
+};
