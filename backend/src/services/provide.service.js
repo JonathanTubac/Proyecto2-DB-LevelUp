@@ -8,14 +8,14 @@ export const getAllProvides = async () => {
 };
 
 export const createProvide = async ({id_prov, id_prod, amount}) => {
-    const provide = await provideRepo.create({id_prod, id_prod, amount});
+    const provide = await provideRepo.create({id_prov, id_prod, amount});
     if(!provide) throw new AppError('Cant create provide!');
 
-    const product = await productRepo.findById({id_prod});
+    const product = await productRepo.findById(id_prod);
     if(!product) throw new NotFoundError('That product doesnt exist!');
 
-    const provider = await providerRepo.findById({id_prov});
+    const provider = await providerRepo.findById(id_prov);
     if(!provider) throw new NotFoundError('That provider doesnt exist!')
         
-    return provide
+    return provide;
 };
