@@ -19,3 +19,10 @@ export const createProvide = async ({id_prov, id_prod, amount}) => {
         
     return provide;
 };
+
+export const updateProvide = async (id, {amount}) => {
+    const provide = await provideRepo.update(id, {amount});
+    if(!provide) throw new NotFoundError('This provide doesnt exist!');
+
+    return provide;
+}

@@ -18,3 +18,14 @@ export const create = async (req, res, next) => {
         next(err);
     }
 }
+
+export const update = async (req, res, next) => {
+    try {
+        const { id } = req.params;
+        const { amount } = req.body;
+        const updated = await provideService.updateProvide(id, { amount });
+        res.status(200).json({ success: true, data: updated });
+    } catch (err) {
+        next(err);
+    }
+}

@@ -6,5 +6,6 @@ const router = Router();
 
 router.get('/', protect, authorize('Administrador'), ctrl.getAll);
 router.post('/', protect, authorize('Administrador'), ctrl.create);
+router.put('/:id', protect, authorize('Administrador'), ctrl.update);
 
 export default router;
