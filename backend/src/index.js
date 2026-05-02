@@ -7,6 +7,7 @@ import producRoutes from './routes/product.routes.js'
 import categoryRoutes from './routes/category.routes.js'
 import walletRoutes from './routes/wallet.routes.js'
 import purchaseRoutes from './routes/compra.routes.js'
+import providerRoutes from './routes/provider.routes.js'
 
 import errorMiddleware from './middlewares/error.middleware.js'
 
@@ -26,6 +27,7 @@ app.use('/api/v1/products', producRoutes);
 app.use('/api/v1/categories', categoryRoutes);
 app.use('/api/v1/wallets', walletRoutes);
 app.use('/api/v1/purchases', purchaseRoutes);
+app.use('/api/v1/providers', providerRoutes);
 
 app.use((req, res) => {
     res.status(404).json({
