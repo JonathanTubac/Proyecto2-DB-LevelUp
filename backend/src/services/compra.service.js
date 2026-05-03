@@ -4,7 +4,8 @@ import * as productRepo from '../repositories/product.repository.js';
 import * as walletRepo from '../repositories/wallet.repository.js';
 import {
     NotFoundError,
-    ValidationError
+    ValidationError,
+    ForbiddenError
 } from '../utils/errors.js';
 
 export const getCompras = async () => {
@@ -14,6 +15,12 @@ export const getCompras = async () => {
 export const createCompra = async (userId, { tipo, productos, id_empleado }) => {
     if (!productos || productos.length === 0)
         throw new ValidationError('You must send al least one product!');
+
+    if (tipo === 'presencial' && !id_empleado)
+        throw new ForbiddenError('Solo empleados pueden registrar compras presenciales');
+
+    if (tipo === 'en_linea' && id_empleado)
+        throw new ForbiddenError('Los empleados no pueden hacer compras en línea');
 
     const productosConPrecio = [];
 

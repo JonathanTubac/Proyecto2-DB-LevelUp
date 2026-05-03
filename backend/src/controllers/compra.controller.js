@@ -11,18 +11,20 @@ export const getAll = async (req, res, next) => {
 }
 
 export const create = async (req, res, next) => {
-    try {
-        const { id: userId } = req.user;
-        const { tipo, productos, id_empleado } = req.body;
-        const result = await compraService.createCompra(userId, {
-            tipo,
-            productos,
-            id_empleado
-        });
-        res.status(201).json({ success: true, data: result });
-    } catch (err) {
-        next(err);
-    }
+  try {
+    const { id: userId } = req.user;
+    const { tipo, productos } = req.body;
+
+    const result = await compraService.createCompra(userId, {
+      tipo,
+      productos,
+      id_empleado: req.user.carnet ?? null,
+    });
+
+    res.status(201).json({ success: true, data: result });
+  } catch (err) {
+    next(err);
+  }
 };
 
 export const getById = async (req, res, next) => {

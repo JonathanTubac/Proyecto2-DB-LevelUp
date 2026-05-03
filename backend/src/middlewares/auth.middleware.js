@@ -7,12 +7,16 @@ export const protect = async (req, res, next) => {
         const token = req.headers.authorization?.split(' ')[1];
         if (!token) throw new UnauthorizedError('Not authorized');
 
-        const { userId } = verifyToken(token, process.env.JWT_SECRET);
+        const decoded = verifyToken(token, process.env.JWT_SECRET);
 
         const user = await userRepo.findById(userId);
         if (!user) throw new UnauthorizedError('User not found!');
 
-        req.user = user;
+        req.user = {
+            ...user,
+            carnet: decoded.carnet ?? null
+        };
+
         next();
     } catch (err) {
         if (err.name === 'TokenExpiredError')
