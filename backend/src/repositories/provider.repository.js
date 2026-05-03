@@ -1,12 +1,21 @@
 import { pool } from "../config/db.js";
 
-export const findAll = async () => {
+export const findAll = async ({ limit, offset, nombre }) => {
     const { rows } = await pool.query(`
-        SELECT *
-        FROM proveedores
-    `);
+    SELECT
+      id, nombre, activo,
+      COUNT(*) OVER() AS total
+    FROM proveedores
+    WHERE activo = true
+      AND ($1::text IS NULL OR nombre ILIKE '%' || $1 || '%')
+    ORDER BY nombre
+    LIMIT $2 OFFSET $3
+  `, [nombre ?? null, limit, offset]);
 
-    return rows;
+    return {
+        data: rows.map(({ total, ...p }) => p),
+        total: parseInt(rows[0]?.total ?? 0),
+    };
 };
 
 export const findById = async (id) => {

@@ -1,14 +1,23 @@
 import { pool } from "../config/db.js";
 
-export const findAll = async () => {
+export const findAll = async ({ limit, offset, rol }) => {
     const { rows } = await pool.query(`
-        SELECT u.id, u.nombre, u.correo, u.telefono, u.activo, TRIM(r.nombre) AS rol
-        FROM usuarios u JOIN roles r ON u.id_rol = r.id
-        WHERE activo = true
-    `)
+    SELECT
+      u.id, u.nombre, u.correo, u.telefono, u.activo,
+      TRIM(r.nombre) AS rol,
+      COUNT(*) OVER() AS total
+    FROM usuarios u
+    JOIN roles r ON r.id = u.id_rol
+    WHERE ($1::text IS NULL OR TRIM(r.nombre) ILIKE $1)
+    ORDER BY u.nombre
+    LIMIT $2 OFFSET $3
+  `, [rol ?? null, limit, offset]);
 
-    return rows;
-}
+    return {
+        data: rows.map(({ total, ...u }) => u),
+        total: parseInt(rows[0]?.total ?? 0),
+    };
+};
 
 export const findById = async (id) => {
     const { rows } = await pool.query(`
@@ -20,16 +29,19 @@ export const findById = async (id) => {
     return rows[0]
 }
 
-export const findByEmail = async (email) => {
-    const {rows} = await pool.query(`
-        SELECT *
-        FROM usuarios
-        WHERE correo = $1
-    `, [email])
-
-    return rows[0];
-}
-
+export const findByEmail = async (correo) => {
+    const { rows } = await pool.query(`
+    SELECT
+      u.id, u.nombre, u.correo, u.password, u.telefono, u.activo,
+      TRIM(r.nombre) AS rol,
+      e.carnet AS empleado_carnet
+    FROM usuarios u
+    JOIN roles r ON r.id = u.id_rol
+    LEFT JOIN empleados e ON e.id_usuario = u.id
+    WHERE u.correo = $1 AND u.activo = true
+  `, [correo]);
+    return rows[0] ?? null;
+};
 export const create = async ({ name, email, password, phone, role_id }) => {
     const { rows } = await pool.query(`
         INSERT INTO usuarios(nombre, correo, password, telefono, id_rol)
