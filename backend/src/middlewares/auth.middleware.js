@@ -9,7 +9,7 @@ export const protect = async (req, res, next) => {
 
         const decoded = verifyToken(token, process.env.JWT_SECRET);
 
-        const user = await userRepo.findById(userId);
+        const user = await userRepo.findById(decoded.userId);
         if (!user) throw new UnauthorizedError('User not found!');
 
         req.user = {
