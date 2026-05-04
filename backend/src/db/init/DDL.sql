@@ -205,3 +205,40 @@ AFTER INSERT OR UPDATE
 ON brinda
 FOR EACH ROW
 EXECUTE FUNCTION update_stock();
+
+CREATE OR REPLACE VIEW dashboard_metrics AS
+SELECT
+  (SELECT COUNT(*) FROM usuarios WHERE activo = true)
+    AS total_usuarios,
+
+  (SELECT COUNT(*) FROM productos WHERE activo = true)
+    AS total_productos,
+
+  (SELECT COUNT(*) FROM compras
+   WHERE DATE_TRUNC('month', fecha) = DATE_TRUNC('month', NOW()))
+    AS compras_mes,
+
+  (SELECT COALESCE(SUM(total), 0) FROM compras
+   WHERE DATE_TRUNC('month', fecha) = DATE_TRUNC('month', NOW()))
+    AS ingresos_mes,
+
+  (SELECT p.nombre FROM detallecompras dc
+   JOIN productos p ON p.id = dc.id_producto
+   GROUP BY p.id, p.nombre
+   ORDER BY SUM(dc.cantidad_producto) DESC
+   LIMIT 1)
+    AS producto_top,
+
+  (SELECT c.nombre FROM detallecompras dc
+   JOIN productos p ON p.id = dc.id_producto
+   JOIN categorias c ON c.id = p.id_categoria
+   GROUP BY c.id, c.nombre
+   ORDER BY SUM(dc.cantidad_producto) DESC
+   LIMIT 1)
+    AS categoria_top,
+
+  (SELECT COUNT(*) FROM billeteras WHERE monto > 0)
+    AS billeteras_activas,
+
+  (SELECT COALESCE(SUM(monto), 0) FROM billeteras)
+    AS saldo_total;

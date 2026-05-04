@@ -1,50 +1,43 @@
-import { useState, useEffect, useCallback } from 'react';
+import { useState, useEffect } from 'react';
 import AdminLayout from '../../components/AdminLayout';
 import Pagination from '../../components/Pagination';
 import Modal from '../../components/Modal';
 import { getProviders, createProvider, updateProvider, deactivateProvider } from '../../api/providers.api';
-import { usePagination } from '../../hooks/usePagination';
 
 export default function Providers() {
     const [providers, setProviders] = useState([]);
     const [pagination, setPagination] = useState(null);
     const [loading, setLoading] = useState(true);
+    const [search, setSearch] = useState('');
+    const [page, setPage] = useState(1);
     const [modal, setModal] = useState(false);
     const [editing, setEditing] = useState(null);
     const [form, setForm] = useState({ name: '' });
     const [saving, setSaving] = useState(false);
     const [formError, setFormError] = useState('');
 
-    const { page, goToPage } = usePagination();
+    useEffect(() => {
+        const timer = setTimeout(async () => {
+            setLoading(true);
+            try {
+                const res = await getProviders({ page, limit: 10, nombre: search || undefined });
+                setProviders(res.data);
+                setPagination(res.pagination);
+            } catch (err) {
+                console.error(err);
+            } finally {
+                setLoading(false);
+            }
+        }, search ? 500 : 0);
 
-    const fetchProviders = useCallback(async () => {
-        setLoading(true);
-        try {
-            const res = await getProviders({ page });
-            setProviders(res.data);
-            setPagination(res.pagination);
-        } catch (err) {
-            console.error(err);
-        } finally {
-            setLoading(false);
-        }
-    }, [page]);
+        return () => clearTimeout(timer);
+    }, [page, search]);
 
-    useEffect(() => { fetchProviders(); }, [fetchProviders]);
+    const handleSearch = (e) => { setSearch(e.target.value); setPage(1); };
+    const handlePage = (p) => setPage(p);
 
-    const openCreate = () => {
-        setEditing(null);
-        setForm({ name: '' });
-        setFormError('');
-        setModal(true);
-    };
-
-    const openEdit = (prov) => {
-        setEditing(prov);
-        setForm({ name: prov.nombre });
-        setFormError('');
-        setModal(true);
-    };
+    const openCreate = () => { setEditing(null); setForm({ name: '' }); setFormError(''); setModal(true); };
+    const openEdit = (p) => { setEditing(p); setForm({ name: p.nombre }); setFormError(''); setModal(true); };
 
     const handleSubmit = async (e) => {
         e.preventDefault();
@@ -54,7 +47,8 @@ export default function Providers() {
             if (editing) await updateProvider(editing.id, form);
             else await createProvider(form);
             setModal(false);
-            fetchProviders();
+            setPage(1);
+            setSearch('');
         } catch (err) {
             setFormError(err.message);
         } finally {
@@ -66,7 +60,7 @@ export default function Providers() {
         if (!confirm('¿Desactivar este proveedor?')) return;
         try {
             await deactivateProvider(id);
-            fetchProviders();
+            setPage(1);
         } catch (err) {
             alert(err.message);
         }
@@ -77,11 +71,21 @@ export default function Providers() {
             <div className="table-card">
                 <div className="table-header">
                     <h3>Proveedores</h3>
-                    <button className="btn-primary" onClick={openCreate}>+ Nuevo proveedor</button>
+                    <div className="table-actions">
+                        <input
+                            className="search-input"
+                            placeholder="Buscar proveedor..."
+                            value={search}
+                            onChange={handleSearch}
+                        />
+                        <button className="btn-primary" onClick={openCreate}>+ Nuevo proveedor</button>
+                    </div>
                 </div>
 
                 {loading ? (
                     <div className="empty-state"><p>⏳</p>Cargando...</div>
+                ) : providers.length === 0 ? (
+                    <div className="empty-state"><p>🏭</p>No hay proveedores</div>
                 ) : (
                     <>
                         <table>
@@ -94,25 +98,25 @@ export default function Providers() {
                                 </tr>
                             </thead>
                             <tbody>
-                                {providers.map(prov => (
-                                    <tr key={prov.id}>
-                                        <td>#{prov.id}</td>
-                                        <td>{prov.nombre}</td>
+                                {providers.map(p => (
+                                    <tr key={p.id}>
+                                        <td>#{p.id}</td>
+                                        <td>{p.nombre}</td>
                                         <td>
-                                            <span className={`badge ${prov.activo ? 'badge-green' : 'badge-red'}`}>
-                                                {prov.activo ? 'Activo' : 'Inactivo'}
+                                            <span className={`badge ${p.activo ? 'badge-green' : 'badge-red'}`}>
+                                                {p.activo ? 'Activo' : 'Inactivo'}
                                             </span>
                                         </td>
                                         <td style={{ display: 'flex', gap: '0.5rem' }}>
                                             <button
                                                 className="btn-secondary"
                                                 style={{ padding: '0.35rem 0.75rem', fontSize: '0.8rem' }}
-                                                onClick={() => openEdit(prov)}
+                                                onClick={() => openEdit(p)}
                                             >
                                                 Editar
                                             </button>
-                                            {prov.activo && (
-                                                <button className="btn-danger" onClick={() => handleDeactivate(prov.id)}>
+                                            {p.activo && (
+                                                <button className="btn-danger" onClick={() => handleDeactivate(p.id)}>
                                                     Desactivar
                                                 </button>
                                             )}
@@ -121,16 +125,13 @@ export default function Providers() {
                                 ))}
                             </tbody>
                         </table>
-                        <Pagination pagination={pagination} onPage={goToPage} />
+                        <Pagination pagination={pagination} onPage={handlePage} />
                     </>
                 )}
             </div>
 
             {modal && (
-                <Modal
-                    title={editing ? 'Editar proveedor' : 'Nuevo proveedor'}
-                    onClose={() => setModal(false)}
-                >
+                <Modal title={editing ? 'Editar proveedor' : 'Nuevo proveedor'} onClose={() => setModal(false)}>
                     <form className="modal-form" onSubmit={handleSubmit}>
                         {formError && <div className="error-message">{formError}</div>}
                         <div className="form-group">
@@ -143,9 +144,7 @@ export default function Providers() {
                             />
                         </div>
                         <div className="modal-actions">
-                            <button type="button" className="btn-secondary" onClick={() => setModal(false)}>
-                                Cancelar
-                            </button>
+                            <button type="button" className="btn-secondary" onClick={() => setModal(false)}>Cancelar</button>
                             <button type="submit" className="btn-primary" disabled={saving}>
                                 {saving ? 'Guardando...' : editing ? 'Guardar cambios' : 'Crear'}
                             </button>

@@ -1,10 +1,9 @@
-import { useState, useEffect, useCallback } from 'react';
+import { useState, useEffect } from 'react';
 import AdminLayout from '../../components/AdminLayout';
 import Pagination from '../../components/Pagination';
 import Modal from '../../components/Modal';
 import { getProducts, createProduct, updateProduct, deactivateProduct } from '../../api/products.api';
 import { getCategories } from '../../api/categories.api';
-import { usePagination } from '../../hooks/usePagination';
 
 const emptyForm = { name: '', price: '', stock: '', id_category: '' };
 
@@ -14,44 +13,40 @@ export default function Products() {
     const [pagination, setPagination] = useState(null);
     const [loading, setLoading] = useState(true);
     const [error, setError] = useState('');
-    const [searchInput, setSearchInput] = useState('');
     const [search, setSearch] = useState('');
+    const [page, setPage] = useState(1);
     const [modal, setModal] = useState(false);
-    const [editing, setEditing] = useState(null); // null = crear, obj = editar
+    const [editing, setEditing] = useState(null);
     const [form, setForm] = useState(emptyForm);
     const [saving, setSaving] = useState(false);
     const [formError, setFormError] = useState('');
 
-    const { page, goToPage, reset } = usePagination();
-
-    // cargar categorías para el select
     useEffect(() => {
         getCategories({ limit: 50 })
             .then(res => setCategories(res.data))
             .catch(() => { });
     }, []);
 
-    const fetchProducts = useCallback(async () => {
-        setLoading(true);
-        setError('');
-        try {
-            const res = await getProducts({ page, nombre: search || undefined });
-            setProducts(res.data);
-            setPagination(res.pagination);
-        } catch (err) {
-            setError(err.message);
-        } finally {
-            setLoading(false);
-        }
+    useEffect(() => {
+        const timer = setTimeout(async () => {
+            setLoading(true);
+            setError('');
+            try {
+                const res = await getProducts({ page, limit: 10, nombre: search || undefined });
+                setProducts(res.data);
+                setPagination(res.pagination);
+            } catch (err) {
+                setError(err.message);
+            } finally {
+                setLoading(false);
+            }
+        }, search ? 500 : 0);
+
+        return () => clearTimeout(timer);
     }, [page, search]);
 
-    useEffect(() => { fetchProducts(); }, [fetchProducts]);
-
-    // debounce search
-    useEffect(() => {
-        const timer = setTimeout(() => { setSearch(searchInput); reset(); }, 500);
-        return () => clearTimeout(timer);
-    }, [searchInput]);
+    const handleSearch = (e) => { setSearch(e.target.value); setPage(1); };
+    const handlePage = (p) => setPage(p);
 
     const openCreate = () => {
         setEditing(null);
@@ -72,11 +67,7 @@ export default function Products() {
         setModal(true);
     };
 
-    const closeModal = () => {
-        setModal(false);
-        setEditing(null);
-        setForm(emptyForm);
-    };
+    const closeModal = () => { setModal(false); setEditing(null); setForm(emptyForm); };
 
     const handleChange = (e) => {
         setForm({ ...form, [e.target.name]: e.target.value });
@@ -87,7 +78,6 @@ export default function Products() {
         e.preventDefault();
         setSaving(true);
         setFormError('');
-
         try {
             const payload = {
                 name: form.name,
@@ -95,15 +85,11 @@ export default function Products() {
                 stock: parseInt(form.stock),
                 id_category: parseInt(form.id_category),
             };
-
-            if (editing) {
-                await updateProduct(editing.id, payload);
-            } else {
-                await createProduct(payload);
-            }
-
+            if (editing) await updateProduct(editing.id, payload);
+            else await createProduct(payload);
             closeModal();
-            fetchProducts();
+            setPage(1);
+            setSearch('');
         } catch (err) {
             setFormError(err.message);
         } finally {
@@ -115,7 +101,7 @@ export default function Products() {
         if (!confirm('¿Desactivar este producto?')) return;
         try {
             await deactivateProduct(id);
-            fetchProducts();
+            setPage(1);
         } catch (err) {
             alert(err.message);
         }
@@ -123,7 +109,6 @@ export default function Products() {
 
     return (
         <AdminLayout title="Productos">
-
             <div className="table-card">
                 <div className="table-header">
                     <h3>Catálogo de productos</h3>
@@ -131,12 +116,10 @@ export default function Products() {
                         <input
                             className="search-input"
                             placeholder="Buscar producto..."
-                            value={searchInput}
-                            onChange={e => setSearchInput(e.target.value)}
+                            value={search}
+                            onChange={handleSearch}
                         />
-                        <button className="btn-primary" onClick={openCreate}>
-                            + Nuevo producto
-                        </button>
+                        <button className="btn-primary" onClick={openCreate}>+ Nuevo producto</button>
                     </div>
                 </div>
 
@@ -169,7 +152,7 @@ export default function Products() {
                                         <td>Q{parseFloat(p.precio).toFixed(2)}</td>
                                         <td>
                                             <span className={`badge ${p.stock > 10 ? 'badge-green' :
-                                                p.stock > 0 ? 'badge-amber' : 'badge-red'
+                                                    p.stock > 0 ? 'badge-amber' : 'badge-red'
                                                 }`}>
                                                 {p.stock} uds
                                             </span>
@@ -197,58 +180,27 @@ export default function Products() {
                                 ))}
                             </tbody>
                         </table>
-                        <Pagination pagination={pagination} onPage={goToPage} />
+                        <Pagination pagination={pagination} onPage={handlePage} />
                     </>
                 )}
             </div>
 
             {modal && (
-                <Modal
-                    title={editing ? 'Editar producto' : 'Nuevo producto'}
-                    onClose={closeModal}
-                >
+                <Modal title={editing ? 'Editar producto' : 'Nuevo producto'} onClose={closeModal}>
                     <form className="modal-form" onSubmit={handleSubmit}>
-                        {formError && (
-                            <div className="error-message">{formError}</div>
-                        )}
-
+                        {formError && <div className="error-message">{formError}</div>}
                         <div className="form-group">
                             <label>Nombre</label>
-                            <input
-                                name="name"
-                                value={form.name}
-                                onChange={handleChange}
-                                placeholder="Nintendo Switch OLED"
-                                required
-                            />
+                            <input name="name" value={form.name} onChange={handleChange} placeholder="Nintendo Switch OLED" required />
                         </div>
-
                         <div className="form-group">
                             <label>Precio (Q)</label>
-                            <input
-                                name="price"
-                                type="number"
-                                step="0.01"
-                                min="0"
-                                value={form.price}
-                                onChange={handleChange}
-                                placeholder="4500.00"
-                                required
-                            />
+                            <input name="price" type="number" step="0.01" min="0" value={form.price} onChange={handleChange} placeholder="4500.00" required />
                         </div>
-
                         <div className="form-group">
                             <label>Stock</label>
-                            <input
-                                name="stock"
-                                type="number"
-                                min="0"
-                                value={form.stock}
-                                onChange={handleChange}
-                                placeholder="15"
-                            />
+                            <input name="stock" type="number" min="0" value={form.stock} onChange={handleChange} placeholder="15" />
                         </div>
-
                         <div className="form-group">
                             <label>Categoría</label>
                             <select name="id_category" value={form.id_category} onChange={handleChange} required>
@@ -258,11 +210,8 @@ export default function Products() {
                                 ))}
                             </select>
                         </div>
-
                         <div className="modal-actions">
-                            <button type="button" className="btn-secondary" onClick={closeModal}>
-                                Cancelar
-                            </button>
+                            <button type="button" className="btn-secondary" onClick={closeModal}>Cancelar</button>
                             <button type="submit" className="btn-primary" disabled={saving}>
                                 {saving ? 'Guardando...' : editing ? 'Guardar cambios' : 'Crear producto'}
                             </button>
@@ -270,7 +219,6 @@ export default function Products() {
                     </form>
                 </Modal>
             )}
-
         </AdminLayout>
     );
 }
