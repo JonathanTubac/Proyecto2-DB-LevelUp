@@ -7,6 +7,7 @@ import cors from 'cors';
 //Middlewares imports
 import errorMiddleware from './middlewares/error.middleware.js'
 import { apiLimiter, authLimiter } from './middlewares/rateLimit.middleware.js';
+import { requestLogger } from './middlewares/logger.middleware.js';
 
 //Routes imports
 import userRouters from './routes/user.routes.js'
@@ -18,11 +19,22 @@ import purchaseRoutes from './routes/compra.routes.js'
 import providerRoutes from './routes/provider.routes.js'
 import provideRoutes from './routes/provide.routes.js'
 
+import swaggerSpec from './config/swagger.js';
+import swaggerUi from 'swagger-ui-express'
+
 const app = express()
 const port = process.env.PORT || 3000
 
 // SECURITY
-app.use(helmet());
+app.use(helmet({
+    contentSecurityPolicy: {
+        directives: {
+            ...helmet.contentSecurityPolicy.getDefaultDirectives(),
+            'script-src': ["'self'", "'unsafe-inline'"],
+            'img-src': ["'self'", 'data:', 'https:'],
+        },
+    },
+}));
 app.use(cors({
     origin: process.env.FRONTEND_URL || 'http:localhost:5173',
     methods: ['GET', 'POST', 'PUT', 'PATCH', 'DELETE'],
@@ -34,6 +46,7 @@ app.use(cors({
 app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
 
+app.use(requestLogger);
 //HEATLH ROUTE
 app.get('/health', (req, res) => {
     res.json({ status: 'ok', timestamp: new Date() })
@@ -52,6 +65,11 @@ app.use('/api/v1/wallets', walletRoutes);
 app.use('/api/v1/purchases', purchaseRoutes);
 app.use('/api/v1/providers', providerRoutes);
 app.use('/api/v1/provide', provideRoutes);
+
+app.use('/api-docs', swaggerUi.serve, swaggerUi.setup(swaggerSpec, {
+    customSiteTitle: 'LevelUp API Docs',
+    swaggerOptions: { persistAuthorization: true },
+}))
 
 //404
 app.use((req, res) => {
