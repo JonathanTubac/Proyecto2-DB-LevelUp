@@ -2,10 +2,10 @@ import { BrowserRouter, Routes, Route, Navigate } from 'react-router-dom';
 import { AuthProvider } from './context/AuthContext';
 import { ProtectedRoute } from './components/ProtectedRoute';
 
-import Login     from './pages/Login';
+import Login from './pages/Login';
 import Dashboard from './pages/admin/Dashboard';
-import Users     from './pages/admin/Users';
-import Products  from './pages/admin/Products';
+import Users from './pages/admin/Users';
+import Products from './pages/admin/Products';
 
 function App() {
   return (

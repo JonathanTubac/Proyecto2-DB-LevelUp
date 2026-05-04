@@ -1,0 +1,40 @@
+* {
+  margin: 0;
+  padding: 0;
+  box-sizing: border-box;
+}
+
+:root {
+  --bg: #080e1a;
+  --card: #0e1a2c;
+  --card2: #162035;
+  --border: #1e3050;
+  --green: #00d4a4;
+  --blue: #4f8ef7;
+  --amber: #f59e0b;
+  --red: #ef4444;
+  --white: #f0f6ff;
+  --gray: #8ba3c9;
+  --font: "Segoe UI", sans-serif;
+}
+
+body {
+  background-color: var(--bg);
+  color: var(--white);
+  font-family: var(--font);
+  min-height: 100vh;
+}
+
+input,
+button {
+  font-family: var(--font);
+}
+
+.loading {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  height: 100vh;
+  color: var(--gray);
+  font-size: 1.2rem;
+}
