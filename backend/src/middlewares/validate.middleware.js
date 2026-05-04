@@ -5,6 +5,7 @@ export const validate = (schema) => (req, res, next) => {
 
     if (!result.success) {
         const errors = result.error?.errors ?? [];
+        console.log('[validate] errors:', JSON.stringify(errors));
         const message = errors
             .map(e => `${e.path.join('.') || 'campo'}: ${e.message}`)
             .join(', ');
