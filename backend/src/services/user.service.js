@@ -2,9 +2,13 @@ import * as userRepo from '../repositories/user.repository.js'
 import * as roleRepo from '../repositories/role.repository.js'
 import { ConfictError, NotFoundError } from '../utils/errors.js'
 import bcrypt from 'bcrypt'
+import { getPagination } from '../utils/pagination.js';
 
-export const getUsers = async () => {
-    return await userRepo.findAll();
+export const getUsers = async (query) => {
+    const { page, limit, offset } = getPagination(query);
+    const { rol } = query;
+
+    return await userRepo.findAll({ limit, offset, rol });
 };
 
 export const getUserById = async (id) => {

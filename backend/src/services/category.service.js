@@ -1,8 +1,12 @@
 import * as categoryRepo from '../repositories/category.repository.js'
 import { NotFoundError } from '../utils/errors.js'
+import { getPagination } from '../utils/pagination.js';
 
-export const getCategories = async () => {
-    return await categoryRepo.findAll();
+export const getCategories = async (query) => {
+    const { page, limit, offset } = getPagination(query);
+    const { nombre } = query;
+
+    return await categoryRepo.findAll({ limit, offset, nombre });
 }
 
 export const getCategoryById = async (id) => {

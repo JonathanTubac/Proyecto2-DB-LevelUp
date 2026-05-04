@@ -7,9 +7,13 @@ import {
     ValidationError,
     ForbiddenError
 } from '../utils/errors.js';
+import { getPagination } from '../utils/pagination.js';
 
-export const getCompras = async () => {
-    return await compraRepo.findAll();
+export const getCompras = async (query) => {
+    const { page, limit, offset } = getPagination(query);
+    const { tipo, fecha_inicio, fecha_fin } = query;
+
+    return await compraRepo.findAll({ limit, offset, tipo, fecha_inicio, fecha_fin });
 }
 
 export const createCompra = async (userId, { tipo, productos, id_empleado }) => {
@@ -112,6 +116,8 @@ export const getCompraById = async (id, userId) => {
     return compra;
 };
 
-export const getMyCompras = async (userId) => {
-    return await compraRepo.findByUserId(userId);
+export const getMyCompras = async (userId, query) => {
+    const { page, limit, offset } = getPagination(query);
+
+    return await compraRepo.findByUserId(userId, { limit, offset });
 };
