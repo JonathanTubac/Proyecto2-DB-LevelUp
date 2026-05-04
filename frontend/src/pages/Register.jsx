@@ -34,11 +34,11 @@ export default function Register() {
         setLoading(true);
         try {
             await registerRequest({
-                nombre: form.nombre,
+                name: form.nombre,
                 email: form.email,
                 password: form.password,
-                telefono: form.telefono || undefined,
-                id_rol: 3, // Cliente por defecto
+                phone: form.telefono || undefined,
+                role_id: 3,
             });
 
             navigate('/login', {
