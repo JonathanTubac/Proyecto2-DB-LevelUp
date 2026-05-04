@@ -4,6 +4,8 @@ import { ProtectedRoute } from './components/ProtectedRoute';
 
 import Login from './pages/Login';
 import Dashboard from './pages/admin/Dashboard';
+import Users from './pages/admin/Users';
+import Products from './pages/admin/Products';
 
 
 function App() {
@@ -21,10 +23,12 @@ function App() {
           } />
           <Route path="/admin/users" element={
             <ProtectedRoute roles={['Administrador']}>
+              <Users />
             </ProtectedRoute>
           } />
           <Route path="/admin/products" element={
             <ProtectedRoute roles={['Administrador']}>
+              <Products/>
             </ProtectedRoute>
           } />
 
