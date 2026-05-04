@@ -1,9 +1,11 @@
 import * as userService from '../services/user.service.js'
+import { getPagination, paginatedResponse } from '../utils/pagination.js';
 
 export const getAll = async (req, res, next) => {
     try {
-        const users = await userService.getUsers()
-        res.json({ success: true, data: users })
+        const { data, total } = await userService.getUsers(req.query);
+        const { page, limit } = getPagination(req.query);
+        res.json({ success: true, ...paginatedResponse(data, total, page, limit) });
     } catch (err) {
         next(err)
     }

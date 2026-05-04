@@ -32,7 +32,7 @@ export const refresh = async (req, res, next) => {
 
 export const logout = async (req, res, next) => {
     try {
-        const { refreshToken } = req.bofy;
+        const { refreshToken } = req.body;
         await authService.logout(refreshToken);
         res.status(204).send();
     } catch (err) {

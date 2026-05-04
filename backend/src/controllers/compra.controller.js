@@ -1,10 +1,11 @@
-import e from 'express';
 import * as compraService from '../services/compra.service.js'
+import { getPagination, paginatedResponse } from '../utils/pagination.js';
 
 export const getAll = async (req, res, next) => {
     try {
-        const compras = await compraService.getCompras();
-        res.status(200).json({success:true, data: compras});
+        const { data, total } = await compraService.getCompras(req.query);
+        const { page, limit } = getPagination(req.query);
+        res.status(200).json({ success: true, ...paginatedResponse(data, total, page, limit) });
     } catch (err) {
         next(err);
     }
@@ -41,8 +42,9 @@ export const getById = async (req, res, next) => {
 export const getUserCompras = async (req, res, next) => {
     try {
         const { id: userId } = req.user;
-        const compras = await compraService.getMyCompras(userId);
-        res.status(200).json({ success: true, data: compras });
+        const { data, total } = await compraService.getMyCompras(userId, req.query);
+        const { page, limit } = getPagination(req.query);
+        res.status(200).json({ success: true, ...paginatedResponse(data, total, page, limit) });
     } catch (err) {
         next(err);
     }

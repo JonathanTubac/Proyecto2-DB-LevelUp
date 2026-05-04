@@ -1,9 +1,11 @@
 import * as categoryService from '../services/category.service.js'
+import { getPagination, paginatedResponse } from '../utils/pagination.js';
 
 export const getAll = async (req, res, next) => {
     try {
-        const categories = await categoryService.getCategories();
-        res.status(200).json({ success: true, data: categories });
+        const { data, total } = await categoryService.getCategories(req.query);
+        const { page, limit } = getPagination(req.query);
+        res.status(200).json({ success: true, ...paginatedResponse(data, total, page, limit) });
     } catch (err) {
         next(err);
     }

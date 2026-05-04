@@ -1,6 +1,6 @@
 import { pool } from "../config/db.js";
 
-export const findAll = async ({ limit, offset, categoria, nombre }) => {
+export const findAll = async ({ limit, offset, category, name }) => {
   const { rows } = await pool.query(`
     SELECT
       p.id, p.nombre, p.precio, p.stock, p.activo,
@@ -9,11 +9,11 @@ export const findAll = async ({ limit, offset, categoria, nombre }) => {
     FROM productos p
     JOIN categorias c ON c.id = p.id_categoria
     WHERE p.activo = true
-      AND ($1::int IS NULL    OR p.id_categoria = $1)
-      AND ($2::text IS NULL   OR p.nombre ILIKE '%' || $2 || '%')
+      AND ($1::int IS NULL OR p.id_categoria = $1)
+      AND ($2::text IS NULL OR p.nombre ILIKE '%' || $2 || '%')
     ORDER BY p.nombre
     LIMIT $3 OFFSET $4
-  `, [categoria ?? null, nombre ?? null, limit, offset]);
+  `, [category ?? null, name ?? null, limit, offset]);
 
   return {
     data: rows.map(({ total, ...p }) => p),

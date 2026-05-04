@@ -50,7 +50,7 @@ export const refresh = async (refreshToken) => {
 
     await authRepo.deleteRefreshToken(refreshToken);
 
-    const tokens = generateTokens(user.id);
+    const tokens = generateTokens(user);
 
     await authRepo.saveRefreshToken({ userId: user.id, token: tokens.refreshToken });
 

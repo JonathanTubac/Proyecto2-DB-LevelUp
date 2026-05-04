@@ -1,8 +1,12 @@
 import * as providerRepo from '../repositories/provider.repository.js'
 import { NotFoundError, AppError } from '../utils/errors.js'
+import { getPagination } from '../utils/pagination.js';
 
-export const getProviders = async () => {
-    return await providerRepo.findAll();
+export const getProviders = async (query) => {
+    const { page, limit, offset } = getPagination(query);
+    const { nombre } = query;
+
+    return await providerRepo.findAll({ limit, offset, nombre });
 }
 
 export const getProvider = async (id) => {

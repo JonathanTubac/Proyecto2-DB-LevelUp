@@ -1,9 +1,11 @@
 import * as providerService from '../services/provider.service.js'
+import { getPagination, paginatedResponse } from '../utils/pagination.js';
 
 export const getAll = async (req, res, next) => {
     try {
-        const providers = await providerService.getProviders();
-        res.status(200).json({ success: true, data: providers });
+        const { data, total } = await providerService.getProviders(req.query);
+        const { page, limit } = getPagination(req.query);
+        res.status(200).json({ success: true, ...paginatedResponse(data, total, page, limit) });
     } catch (err) {
         next(err);
     }

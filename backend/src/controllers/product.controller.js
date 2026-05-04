@@ -1,9 +1,15 @@
 import * as productService from '../services/product.service.js'
+import { getPagination, paginatedResponse } from '../utils/pagination.js';
 
 export const getAll = async (req, res, next) => {
     try {
-        const products = await productService.getProducts();
-        res.status(200).json({ success: true, data: products });
+        const { data, total } = await productService.getProducts(req.query);
+        const { page, limit } = getPagination(req.query);
+
+        res.json({ 
+            success: true, 
+            ...paginatedResponse(data, total, page, limit) 
+        });
     } catch (err) {
         next(err);
     }
