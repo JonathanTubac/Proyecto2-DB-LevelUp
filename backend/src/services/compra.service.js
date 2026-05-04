@@ -121,3 +121,7 @@ export const getMyCompras = async (userId, query) => {
 
     return await compraRepo.findByUserId(userId, { limit, offset });
 };
+
+export const getMyReport = async (userId, filters) => {
+  return await compraRepo.getReportByUserId(userId, filters);
+};

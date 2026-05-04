@@ -14,6 +14,7 @@ import { CartProvider } from './context/CartContext';
 import Store from './pages/client/Store';
 import Profile from './pages/client/Profile';
 import MyPurchases from './pages/client/MyPurchases';
+import Report from './pages/client/Report';
 
 const AdminRoute = ({ children }) => (
   <ProtectedRoute roles={['Administrador']}>{children}</ProtectedRoute>
@@ -48,6 +49,9 @@ function App() {
             } />
             <Route path="/cliente/compras" element={
               <ClientRoute><MyPurchases /></ClientRoute>
+            } />
+            <Route path="/cliente/reporte" element={
+              <ClientRoute><Report /></ClientRoute>
             } />
           </Routes>
         </BrowserRouter>

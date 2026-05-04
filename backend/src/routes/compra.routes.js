@@ -6,6 +6,8 @@ import { purchaseSchema } from '../schemas/purchase.schema.js';
 
 const router = Router();
 
+router.get('/report', protect, ctrl.getMyReport);
+
 /**
  * @swagger
  * /api/v1/purchases:

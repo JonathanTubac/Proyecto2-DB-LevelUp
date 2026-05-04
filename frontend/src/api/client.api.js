@@ -37,3 +37,10 @@ export const getMyPurchases = async ({ page = 1, limit = 10 } = {}) => {
 export const getMyProfile = async () => {
   return await fetchWithAuth('/users/me');
 };
+
+export const getMyReport = async ({ fecha_inicio, fecha_fin } = {}) => {
+  const params = new URLSearchParams();
+  if (fecha_inicio) params.append('fecha_inicio', fecha_inicio);
+  if (fecha_fin)    params.append('fecha_fin',    fecha_fin);
+  return await fetchWithAuth(`/purchases/report?${params}`);
+};
