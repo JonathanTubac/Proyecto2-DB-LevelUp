@@ -1,29 +1,29 @@
 import { fetchWithAuth } from './fetchWithAuth';
 
 export const getProducts = async ({ page = 1, limit = 10, nombre, categoria } = {}) => {
-  const params = new URLSearchParams({ page, limit });
-  if (nombre)    params.append('nombre', nombre);
-  if (categoria) params.append('categoria', categoria);
+    const params = new URLSearchParams({ page, limit });
+    if (nombre) params.append('nombre', nombre);
+    if (categoria) params.append('categoria', categoria);
 
-  return await fetchWithAuth(`/products?${params}`);
+    return await fetchWithAuth(`/products?${params}`);
 };
 
 export const createProduct = async (data) => {
-  return await fetchWithAuth('/products', {
-    method: 'POST',
-    body:   JSON.stringify(data),
-  });
+    return await fetchWithAuth('/products', {
+        method: 'POST',
+        body: JSON.stringify(data),
+    });
 };
 
 export const updateProduct = async (id, data) => {
-  return await fetchWithAuth(`/products/${id}`, {
-    method: 'PUT',
-    body:   JSON.stringify(data),
-  });
+    return await fetchWithAuth(`/products/${id}`, {
+        method: 'PUT',
+        body: JSON.stringify(data),
+    });
 };
 
 export const deactivateProduct = async (id) => {
-  return await fetchWithAuth(`/products/${id}`, {
-    method: 'DELETE',
-  });
+    return await fetchWithAuth(`/products/${id}`, {
+        method: 'DELETE',
+    });
 };
