@@ -7,6 +7,7 @@ import cors from 'cors';
 //Middlewares imports
 import errorMiddleware from './middlewares/error.middleware.js'
 import { apiLimiter, authLimiter } from './middlewares/rateLimit.middleware.js';
+import { requestLogger } from './middlewares/logger.middleware.js';
 
 //Routes imports
 import userRouters from './routes/user.routes.js'
@@ -34,6 +35,7 @@ app.use(cors({
 app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
 
+app.use(requestLogger);
 //HEATLH ROUTE
 app.get('/health', (req, res) => {
     res.json({ status: 'ok', timestamp: new Date() })
