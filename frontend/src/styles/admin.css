@@ -1,0 +1,393 @@
+.admin-layout {
+  display:    flex;
+  min-height: 100vh;
+}
+
+.sidebar {
+  width:            240px;
+  min-height:       100vh;
+  background-color: var(--card);
+  border-right:     1px solid var(--border);
+  display:          flex;
+  flex-direction:   column;
+  position:         fixed;
+  top:              0;
+  left:             0;
+}
+
+.sidebar-logo {
+  padding:       1.5rem;
+  border-bottom: 1px solid var(--border);
+}
+
+.sidebar-logo h2 {
+  color:       var(--green);
+  font-size:   1.4rem;
+  font-weight: 700;
+}
+
+.sidebar-logo p {
+  color:     var(--gray);
+  font-size: 0.75rem;
+  margin-top: 0.2rem;
+}
+
+.sidebar-nav {
+  flex:    1;
+  padding: 1rem 0;
+}
+
+.nav-section {
+  padding:       0.5rem 1rem;
+  font-size:     0.7rem;
+  color:         var(--gray);
+  font-weight:   600;
+  text-transform: uppercase;
+  letter-spacing: 0.1em;
+  margin-top:    0.5rem;
+}
+
+.nav-item {
+  display:         flex;
+  align-items:     center;
+  gap:             0.75rem;
+  padding:         0.7rem 1.5rem;
+  color:           var(--gray);
+  text-decoration: none;
+  font-size:       0.9rem;
+  transition:      all 0.2s;
+  border-left:     3px solid transparent;
+}
+
+.nav-item:hover {
+  color:            var(--white);
+  background-color: var(--card2);
+}
+
+.nav-item.active {
+  color:            var(--green);
+  background-color: var(--card2);
+  border-left-color: var(--green);
+}
+
+.nav-icon {
+  font-size: 1.1rem;
+  width:     20px;
+  text-align: center;
+}
+
+.sidebar-footer {
+  padding:    1rem 1.5rem;
+  border-top: 1px solid var(--border);
+}
+
+.sidebar-user {
+  display:     flex;
+  align-items: center;
+  gap:         0.75rem;
+  margin-bottom: 0.75rem;
+}
+
+.user-avatar {
+  width:            36px;
+  height:           36px;
+  border-radius:    50%;
+  background-color: var(--green);
+  color:            var(--bg);
+  display:          flex;
+  align-items:      center;
+  justify-content:  center;
+  font-weight:      700;
+  font-size:        0.9rem;
+  flex-shrink:      0;
+}
+
+.user-info p {
+  font-size:   0.85rem;
+  color:       var(--white);
+  font-weight: 600;
+}
+
+.user-info span {
+  font-size: 0.75rem;
+  color:     var(--green);
+}
+
+.btn-logout {
+  width:            100%;
+  background-color: transparent;
+  border:           1px solid var(--border);
+  border-radius:    8px;
+  padding:          0.5rem;
+  color:            var(--gray);
+  font-size:        0.85rem;
+  cursor:           pointer;
+  transition:       all 0.2s;
+}
+
+.btn-logout:hover {
+  border-color: var(--red);
+  color:        var(--red);
+}
+
+.admin-main {
+  margin-left: 240px;
+  flex:        1;
+  display:     flex;
+  flex-direction: column;
+}
+
+.admin-navbar {
+  height:           60px;
+  background-color: var(--card);
+  border-bottom:    1px solid var(--border);
+  display:          flex;
+  align-items:      center;
+  justify-content:  space-between;
+  padding:          0 1.5rem;
+  position:         sticky;
+  top:              0;
+  z-index:          10;
+}
+
+.navbar-title {
+  font-size:   1.1rem;
+  font-weight: 600;
+  color:       var(--white);
+}
+
+.navbar-right {
+  display:     flex;
+  align-items: center;
+  gap:         1rem;
+}
+
+.navbar-date {
+  font-size: 0.8rem;
+  color:     var(--gray);
+}
+
+.admin-content {
+  padding: 1.5rem;
+  flex:    1;
+}
+
+.stats-grid {
+  display:               grid;
+  grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+  gap:                   1rem;
+  margin-bottom:         1.5rem;
+}
+
+.stat-card {
+  background-color: var(--card);
+  border:           1px solid var(--border);
+  border-radius:    10px;
+  padding:          1.25rem;
+}
+
+.stat-card-header {
+  display:         flex;
+  justify-content: space-between;
+  align-items:     center;
+  margin-bottom:   0.75rem;
+}
+
+.stat-card-header span {
+  font-size: 0.8rem;
+  color:     var(--gray);
+}
+
+.stat-icon {
+  font-size: 1.4rem;
+}
+
+.stat-card h3 {
+  font-size:   1.8rem;
+  font-weight: 700;
+  color:       var(--white);
+}
+
+.stat-card p {
+  font-size:  0.8rem;
+  color:      var(--gray);
+  margin-top: 0.25rem;
+}
+
+.table-card {
+  background-color: var(--card);
+  border:           1px solid var(--border);
+  border-radius:    10px;
+  overflow:         hidden;
+}
+
+.table-header {
+  display:         flex;
+  justify-content: space-between;
+  align-items:     center;
+  padding:         1rem 1.25rem;
+  border-bottom:   1px solid var(--border);
+}
+
+.table-header h3 {
+  font-size:   1rem;
+  font-weight: 600;
+}
+
+.table-actions {
+  display: flex;
+  gap:     0.5rem;
+}
+
+table {
+  width:           100%;
+  border-collapse: collapse;
+}
+
+th {
+  padding:    0.75rem 1.25rem;
+  text-align: left;
+  font-size:  0.8rem;
+  color:      var(--gray);
+  font-weight: 600;
+  background-color: var(--card2);
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+}
+
+td {
+  padding:     0.85rem 1.25rem;
+  font-size:   0.9rem;
+  border-top:  1px solid var(--border);
+  color:       var(--white);
+}
+
+tr:hover td {
+  background-color: var(--card2);
+}
+
+.badge {
+  padding:       0.25rem 0.6rem;
+  border-radius: 20px;
+  font-size:     0.75rem;
+  font-weight:   600;
+}
+
+.badge-green  { background-color: rgba(0,212,164,0.15); color: var(--green); }
+.badge-red    { background-color: rgba(239,68,68,0.15);  color: var(--red); }
+.badge-blue   { background-color: rgba(79,142,247,0.15); color: var(--blue); }
+.badge-amber  { background-color: rgba(245,158,11,0.15); color: var(--amber); }
+
+.btn-primary {
+  background-color: var(--green);
+  color:            var(--bg);
+  border:           none;
+  border-radius:    8px;
+  padding:          0.5rem 1rem;
+  font-size:        0.85rem;
+  font-weight:      600;
+  cursor:           pointer;
+  transition:       opacity 0.2s;
+}
+
+.btn-primary:hover { opacity: 0.85; }
+
+.btn-secondary {
+  background-color: transparent;
+  color:            var(--gray);
+  border:           1px solid var(--border);
+  border-radius:    8px;
+  padding:          0.5rem 1rem;
+  font-size:        0.85rem;
+  cursor:           pointer;
+  transition:       all 0.2s;
+}
+
+.btn-secondary:hover {
+  color:        var(--white);
+  border-color: var(--white);
+}
+
+.btn-danger {
+  background-color: transparent;
+  color:            var(--red);
+  border:           1px solid var(--red);
+  border-radius:    6px;
+  padding:          0.35rem 0.75rem;
+  font-size:        0.8rem;
+  cursor:           pointer;
+  transition:       all 0.2s;
+}
+
+.btn-danger:hover {
+  background-color: var(--red);
+  color:            var(--white);
+}
+
+.search-input {
+  background-color: var(--card2);
+  border:           1px solid var(--border);
+  border-radius:    8px;
+  padding:          0.5rem 1rem;
+  color:            var(--white);
+  font-size:        0.85rem;
+  outline:          none;
+  width:            220px;
+  transition:       border-color 0.2s;
+}
+
+.search-input:focus { border-color: var(--green); }
+.search-input::placeholder { color: var(--gray); }
+
+.pagination {
+  display:         flex;
+  justify-content: center;
+  align-items:     center;
+  gap:             0.5rem;
+  padding:         1rem;
+  border-top:      1px solid var(--border);
+}
+
+.pagination button {
+  background-color: var(--card2);
+  border:           1px solid var(--border);
+  border-radius:    6px;
+  padding:          0.4rem 0.75rem;
+  color:            var(--gray);
+  cursor:           pointer;
+  font-size:        0.85rem;
+  transition:       all 0.2s;
+}
+
+.pagination button:hover:not(:disabled) {
+  border-color: var(--green);
+  color:        var(--green);
+}
+
+.pagination button.active {
+  background-color: var(--green);
+  border-color:     var(--green);
+  color:            var(--bg);
+  font-weight:      600;
+}
+
+.pagination button:disabled {
+  opacity: 0.4;
+  cursor:  not-allowed;
+}
+
+.pagination span {
+  color:     var(--gray);
+  font-size: 0.85rem;
+}
+
+.empty-state {
+  text-align: center;
+  padding:    3rem;
+  color:      var(--gray);
+}
+
+.empty-state p {
+  font-size:  1.5rem;
+  margin-bottom: 0.5rem;
+}
