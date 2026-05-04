@@ -49,3 +49,14 @@ export const getUserCompras = async (req, res, next) => {
         next(err);
     }
 }
+
+export const getMyReport = async (req, res, next) => {
+  try {
+    const { fecha_inicio, fecha_fin } = req.query;
+    const report = await purchaseService.getMyReport(
+      req.user.id,
+      { fecha_inicio, fecha_fin }
+    );
+    res.json({ success: true, data: report });
+  } catch (err) { next(err); }
+};

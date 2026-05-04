@@ -88,3 +88,48 @@ export const findByUserId = async (id_usuario, { limit, offset }) => {
         total: parseInt(rows[0]?.total_count ?? 0),
     };
 };
+
+export const getReportByUserId = async (id_usuario, { fecha_inicio, fecha_fin } = {}) => {
+  const { rows } = await pool.query(`
+    SELECT
+      c.id,
+      c.tipo,
+      c.fecha,
+      c.total,
+      json_agg(
+        json_build_object(
+          'nombre',          p.nombre,
+          'cantidad',        dc.cantidad_producto,
+          'precio_unitario', dc.precio_unitario,
+          'subtotal',        dc.cantidad_producto * dc.precio_unitario
+        )
+      ) AS detalle
+    FROM compras c
+    JOIN detallecompras dc ON dc.id_compra = c.id
+    JOIN productos p ON p.id = dc.id_producto
+    WHERE c.id_usuario = $1
+      AND ($2::timestamp IS NULL OR c.fecha >= $2)
+      AND ($3::timestamp IS NULL OR c.fecha <= $3)
+    GROUP BY c.id
+    ORDER BY c.fecha DESC
+  `, [id_usuario, fecha_inicio ?? null, fecha_fin ?? null]);
+
+  const totalGastado   = rows.reduce((acc, r) => acc + parseFloat(r.total), 0);
+  const totalCompras   = rows.length;
+  const productoMasComprado = rows
+    .flatMap(r => r.detalle)
+    .reduce((acc, item) => {
+      acc[item.nombre] = (acc[item.nombre] || 0) + item.cantidad;
+      return acc;
+    }, {});
+
+  const topProducto = Object.entries(productoMasComprado)
+    .sort((a, b) => b[1] - a[1])[0]?.[0] ?? '—';
+
+  return {
+    compras:       rows,
+    totalGastado,
+    totalCompras,
+    topProducto,
+  };
+};
