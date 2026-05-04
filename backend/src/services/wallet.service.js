@@ -1,8 +1,10 @@
 import * as walletRepository from '../repositories/wallet.repository.js'
 import { NotFoundError, ValidationError } from '../utils/errors.js'
+import { getPagination } from '../utils/pagination.js'
 
-export const getWallets = async () => {
-    return await walletRepository.findAll();
+export const getWallets = async (query) => {
+    const { limit, offset } = getPagination(query);
+    return await walletRepository.findAll({ limit, offset });
 }
 
 export const getWalletById = async (id) => {

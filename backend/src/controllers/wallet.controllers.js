@@ -3,7 +3,7 @@ import { update } from './user.controller.js';
 
 export const getAll = async (req, res, next) => {
     try {
-        const wallets = await walletService.getWallets();
+        const wallets = await walletService.getWallets(req.query);
         res.status(200).json({ success: true, data: wallets });
     } catch (err) {
         next(err);
