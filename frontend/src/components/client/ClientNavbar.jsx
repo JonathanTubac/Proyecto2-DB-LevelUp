@@ -39,6 +39,9 @@ export default function ClientNavbar({ onCartOpen }) {
                 >
                     Mis compras
                 </NavLink>
+                <NavLink to="/cliente/reporte" className={({ isActive }) => `client-nav-link ${isActive ? 'active' : ''}`}>
+                    Mi reporte
+                </NavLink>
             </div>
 
             <div className="client-navbar-actions">

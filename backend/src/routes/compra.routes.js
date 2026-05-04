@@ -193,4 +193,6 @@ router.get('/:id', protect, ctrl.getById);
  */
 router.post('/', protect, validate(purchaseSchema), ctrl.create);
 
+
+router.get('/report', protect, ctrl.getMyReport);
 export default router;
