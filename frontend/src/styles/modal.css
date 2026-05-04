@@ -1,0 +1,91 @@
+.modal-overlay {
+  position:         fixed;
+  inset:            0;
+  background-color: rgba(0, 0, 0, 0.6);
+  display:          flex;
+  justify-content:  center;
+  align-items:      center;
+  z-index:          100;
+  backdrop-filter:  blur(4px);
+}
+
+.modal-card {
+  background-color: var(--card);
+  border:           1px solid var(--border);
+  border-radius:    12px;
+  width:            100%;
+  max-width:        480px;
+  max-height:       90vh;
+  overflow-y:       auto;
+}
+
+.modal-header {
+  display:         flex;
+  justify-content: space-between;
+  align-items:     center;
+  padding:         1.25rem 1.5rem;
+  border-bottom:   1px solid var(--border);
+}
+
+.modal-header h3 {
+  font-size:   1rem;
+  font-weight: 600;
+}
+
+.modal-close {
+  background: none;
+  border:     none;
+  color:      var(--gray);
+  font-size:  1.1rem;
+  cursor:     pointer;
+  transition: color 0.2s;
+}
+
+.modal-close:hover { color: var(--red); }
+
+.modal-body {
+  padding: 1.5rem;
+}
+
+.modal-form {
+  display:        flex;
+  flex-direction: column;
+  gap:            1rem;
+}
+
+.modal-form .form-group label {
+  font-size:   0.85rem;
+  color:       var(--gray);
+  font-weight: 500;
+  display:     block;
+  margin-bottom: 0.4rem;
+}
+
+.modal-form .form-group input,
+.modal-form .form-group select {
+  width:            100%;
+  background-color: var(--card2);
+  border:           1px solid var(--border);
+  border-radius:    8px;
+  padding:          0.75rem 1rem;
+  color:            var(--white);
+  font-size:        0.9rem;
+  outline:          none;
+  transition:       border-color 0.2s;
+}
+
+.modal-form .form-group input:focus,
+.modal-form .form-group select:focus {
+  border-color: var(--green);
+}
+
+.modal-form .form-group select option {
+  background-color: var(--card2);
+}
+
+.modal-actions {
+  display:         flex;
+  justify-content: flex-end;
+  gap:             0.75rem;
+  margin-top:      0.5rem;
+}
