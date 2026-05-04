@@ -9,6 +9,7 @@ import Categories from './pages/admin/Categories';
 import Providers from './pages/admin/Providers';
 import Purchases from './pages/admin/Purchases';
 import Wallets from './pages/admin/Wallets';
+import Register from './pages/Register';
 
 const AdminRoute = ({ children }) => (
   <ProtectedRoute roles={['Administrador']}>{children}</ProtectedRoute>
@@ -19,6 +20,7 @@ function App() {
     <AuthProvider>
       <BrowserRouter>
         <Routes>
+          <Route path="/register" element={<Register />} />
           <Route path="/" element={<Navigate to="/login" replace />} />
           <Route path="/login" element={<Login />} />
           <Route path="/admin" element={<AdminRoute><Dashboard /></AdminRoute>} />

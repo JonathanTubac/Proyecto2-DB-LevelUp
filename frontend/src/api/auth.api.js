@@ -12,6 +12,18 @@ export const loginRequest = async ({ email, password }) => {
     return data;
 };
 
+export const registerRequest = async (data) => {
+  const res = await fetch(`${BASE_URL}/auth/register`, {
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json' },
+    body: JSON.stringify(data),
+  });
+
+  const json = await res.json();
+  if (!res.ok) throw new Error(json.error?.message || 'Error al registrarse');
+  return json;
+};
+
 export const logoutRequest = async (refreshToken) => {
     await fetch(`${BASE_URL}/auth/logout`, {
         method: 'POST',
