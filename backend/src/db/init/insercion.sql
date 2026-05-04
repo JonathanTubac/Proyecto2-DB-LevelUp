@@ -95,7 +95,7 @@ INSERT INTO usuarios (nombre, correo, password, telefono, activo, id_rol) VALUES
   (
     'Admin LevelUp',
     'admin@levelup.com',
-    '$2a$12$92IXUNpkjO0rOQ5byMi.Ye4oKoEa3Ro9llC/.og/at2.uheWG/igi', -- Password1!
+    '$2b$12$1bFpX/tnn7LKPWEjJ5MR3uv4vd6TfzXYPvoPaUdaLFkUzpyfTFps2', -- Password!1
     '12345678',
     true,
     1
@@ -105,7 +105,7 @@ INSERT INTO usuarios (nombre, correo, password, telefono, activo, id_rol) VALUES
   (
     'Carlos Pérez',
     'carlos@levelup.com',
-    '$2a$12$92IXUNpkjO0rOQ5byMi.Ye4oKoEa3Ro9llC/.og/at2.uheWG/igi',
+    '$2b$12$1bFpX/tnn7LKPWEjJ5MR3uv4vd6TfzXYPvoPaUdaLFkUzpyfTFps2',
     '23456789',
     true,
     2
@@ -113,7 +113,7 @@ INSERT INTO usuarios (nombre, correo, password, telefono, activo, id_rol) VALUES
   (
     'María López',
     'maria@levelup.com',
-    '$2a$12$92IXUNpkjO0rOQ5byMi.Ye4oKoEa3Ro9llC/.og/at2.uheWG/igi',
+    '$2b$12$1bFpX/tnn7LKPWEjJ5MR3uv4vd6TfzXYPvoPaUdaLFkUzpyfTFps2',
     '34567890',
     true,
     2
@@ -123,7 +123,7 @@ INSERT INTO usuarios (nombre, correo, password, telefono, activo, id_rol) VALUES
   (
     'Juan García',
     'juan@gmail.com',
-    '$2a$12$92IXUNpkjO0rOQ5byMi.Ye4oKoEa3Ro9llC/.og/at2.uheWG/igi',
+    '$2b$12$1bFpX/tnn7LKPWEjJ5MR3uv4vd6TfzXYPvoPaUdaLFkUzpyfTFps2',
     '45678901',
     true,
     3
@@ -131,7 +131,7 @@ INSERT INTO usuarios (nombre, correo, password, telefono, activo, id_rol) VALUES
   (
     'Ana Martínez',
     'ana@gmail.com',
-    '$2a$12$92IXUNpkjO0rOQ5byMi.Ye4oKoEa3Ro9llC/.og/at2.uheWG/igi',
+    '$2b$12$1bFpX/tnn7LKPWEjJ5MR3uv4vd6TfzXYPvoPaUdaLFkUzpyfTFps2',
     '56789012',
     true,
     3
@@ -139,7 +139,7 @@ INSERT INTO usuarios (nombre, correo, password, telefono, activo, id_rol) VALUES
   (
     'Pedro Ramírez',
     'pedro@gmail.com',
-    '$2a$12$92IXUNpkjO0rOQ5byMi.Ye4oKoEa3Ro9llC/.og/at2.uheWG/igi',
+    '$2b$12$1bFpX/tnn7LKPWEjJ5MR3uv4vd6TfzXYPvoPaUdaLFkUzpyfTFps2',
     '67890123',
     true,
     3
