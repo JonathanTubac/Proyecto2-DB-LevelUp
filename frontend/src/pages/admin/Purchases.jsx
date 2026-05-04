@@ -1,34 +1,37 @@
-import { useState, useEffect, useCallback } from 'react';
+import { useState, useEffect } from 'react';
 import AdminLayout from '../../components/AdminLayout';
 import Pagination from '../../components/Pagination';
 import Modal from '../../components/Modal';
 import { getPurchases, getPurchaseById } from '../../api/purchases.api';
-import { usePagination } from '../../hooks/usePagination';
 
 export default function Purchases() {
     const [purchases, setPurchases] = useState([]);
     const [pagination, setPagination] = useState(null);
     const [loading, setLoading] = useState(true);
     const [tipoFilter, setTipoFilter] = useState('');
+    const [page, setPage] = useState(1);
     const [detail, setDetail] = useState(null);
     const [detailOpen, setDetailOpen] = useState(false);
 
-    const { page, goToPage, reset } = usePagination();
+    useEffect(() => {
+        const timer = setTimeout(async () => {
+            setLoading(true);
+            try {
+                const res = await getPurchases({ page, limit: 10, tipo: tipoFilter || undefined });
+                setPurchases(res.data);
+                setPagination(res.pagination);
+            } catch (err) {
+                console.error(err);
+            } finally {
+                setLoading(false);
+            }
+        }, 0);
 
-    const fetchPurchases = useCallback(async () => {
-        setLoading(true);
-        try {
-            const res = await getPurchases({ page, tipo: tipoFilter || undefined });
-            setPurchases(res.data);
-            setPagination(res.pagination);
-        } catch (err) {
-            console.error(err);
-        } finally {
-            setLoading(false);
-        }
+        return () => clearTimeout(timer);
     }, [page, tipoFilter]);
 
-    useEffect(() => { fetchPurchases(); }, [fetchPurchases]);
+    const handleTipo = (e) => { setTipoFilter(e.target.value); setPage(1); };
+    const handlePage = (p) => setPage(p);
 
     const openDetail = async (id) => {
         try {
@@ -49,7 +52,7 @@ export default function Purchases() {
                         className="search-input"
                         style={{ width: 'auto' }}
                         value={tipoFilter}
-                        onChange={e => { setTipoFilter(e.target.value); reset(); }}
+                        onChange={handleTipo}
                     >
                         <option value="">Todos los tipos</option>
                         <option value="en_linea">En línea</option>
@@ -84,7 +87,9 @@ export default function Purchases() {
                                             </span>
                                         </td>
                                         <td>{new Date(p.fecha).toLocaleDateString('es-GT')}</td>
-                                        <td>Q{parseFloat(p.total).toFixed(2)}</td>
+                                        <td style={{ color: 'var(--green)', fontWeight: 600 }}>
+                                            Q{parseFloat(p.total).toFixed(2)}
+                                        </td>
                                         <td>#{p.id_usuario}</td>
                                         <td>
                                             <button
@@ -99,13 +104,13 @@ export default function Purchases() {
                                 ))}
                             </tbody>
                         </table>
-                        <Pagination pagination={pagination} onPage={goToPage} />
+                        <Pagination pagination={pagination} onPage={handlePage} />
                     </>
                 )}
             </div>
 
             {detailOpen && detail && (
-                <Modal title={`Detalle de compra #${detail.id}`} onClose={() => setDetailOpen(false)}>
+                <Modal title={`Detalle compra #${detail.id}`} onClose={() => setDetailOpen(false)}>
                     <div style={{ display: 'flex', flexDirection: 'column', gap: '1rem' }}>
                         <div style={{ display: 'flex', justifyContent: 'space-between' }}>
                             <span style={{ color: 'var(--gray)' }}>Tipo</span>
@@ -123,9 +128,7 @@ export default function Purchases() {
                                 Q{parseFloat(detail.total).toFixed(2)}
                             </span>
                         </div>
-
                         <hr style={{ borderColor: 'var(--border)' }} />
-
                         <h4 style={{ color: 'var(--gray)', fontSize: '0.85rem' }}>PRODUCTOS</h4>
                         {detail.detalle?.map((item, i) => (
                             <div key={i} style={{ display: 'flex', justifyContent: 'space-between', fontSize: '0.9rem' }}>

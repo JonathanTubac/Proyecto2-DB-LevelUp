@@ -1,8 +1,7 @@
-import { useState, useEffect, useCallback } from 'react';
+import { useState, useEffect } from 'react';
 import AdminLayout from '../../components/AdminLayout';
 import Pagination from '../../components/Pagination';
 import { getUsers, deactivateUser } from '../../api/users.api';
-import { usePagination } from '../../hooks/usePagination';
 
 export default function Users() {
     const [users, setUsers] = useState([]);
@@ -11,51 +10,49 @@ export default function Users() {
     const [error, setError] = useState('');
     const [search, setSearch] = useState('');
     const [rolFilter, setRolFilter] = useState('');
-
-    const { page, goToPage, reset } = usePagination();
-
-    const fetchUsers = useCallback(async () => {
-        setLoading(true);
-        setError('');
-        try {
-            const res = await getUsers({ page, rol: rolFilter });
-            setUsers(res.data);
-            setPagination(res.pagination);
-        } catch (err) {
-            setError(err.message);
-        } finally {
-            setLoading(false);
-        }
-    }, [page, rolFilter]);
+    const [page, setPage] = useState(1);
 
     useEffect(() => {
-        fetchUsers();
-    }, [fetchUsers]);
+        const timer = setTimeout(async () => {
+            setLoading(true);
+            setError('');
+            try {
+                const res = await getUsers({ page, limit: 10, rol: rolFilter || undefined });
+                // filtro local por nombre/correo
+                const filtered = search
+                    ? res.data.filter(u =>
+                        u.nombre.toLowerCase().includes(search.toLowerCase()) ||
+                        u.correo.toLowerCase().includes(search.toLowerCase())
+                    )
+                    : res.data;
+                setUsers(filtered);
+                setPagination(res.pagination);
+            } catch (err) {
+                setError(err.message);
+            } finally {
+                setLoading(false);
+            }
+        }, search ? 500 : 0);
+
+        return () => clearTimeout(timer);
+    }, [page, search, rolFilter]);
+
+    const handleSearch = (e) => { setSearch(e.target.value); setPage(1); };
+    const handleRolFilter = (e) => { setRolFilter(e.target.value); setPage(1); };
+    const handlePage = (p) => setPage(p);
 
     const handleDeactivate = async (id) => {
         if (!confirm('¿Desactivar este usuario?')) return;
         try {
             await deactivateUser(id);
-            fetchUsers();
+            setPage(1);
         } catch (err) {
             alert(err.message);
         }
     };
 
-    const handleRolFilter = (e) => {
-        setRolFilter(e.target.value);
-        reset();
-    };
-
-    // filtro local por nombre mientras escribe
-    const filtered = users.filter(u =>
-        u.nombre.toLowerCase().includes(search.toLowerCase()) ||
-        u.correo.toLowerCase().includes(search.toLowerCase())
-    );
-
     return (
         <AdminLayout title="Usuarios">
-
             <div className="table-card">
                 <div className="table-header">
                     <h3>Todos los usuarios</h3>
@@ -64,13 +61,13 @@ export default function Users() {
                             className="search-input"
                             placeholder="Buscar por nombre o correo..."
                             value={search}
-                            onChange={e => setSearch(e.target.value)}
+                            onChange={handleSearch}
                         />
                         <select
                             className="search-input"
+                            style={{ width: 'auto' }}
                             value={rolFilter}
                             onChange={handleRolFilter}
-                            style={{ width: 'auto' }}
                         >
                             <option value="">Todos los roles</option>
                             <option value="Administrador">Administrador</option>
@@ -84,7 +81,7 @@ export default function Users() {
 
                 {loading ? (
                     <div className="empty-state"><p>⏳</p>Cargando...</div>
-                ) : filtered.length === 0 ? (
+                ) : users.length === 0 ? (
                     <div className="empty-state"><p>👥</p>No hay usuarios</div>
                 ) : (
                     <>
@@ -101,7 +98,7 @@ export default function Users() {
                                 </tr>
                             </thead>
                             <tbody>
-                                {filtered.map(user => (
+                                {users.map(user => (
                                     <tr key={user.id}>
                                         <td>#{user.id}</td>
                                         <td>{user.nombre}</td>
@@ -122,10 +119,7 @@ export default function Users() {
                                         </td>
                                         <td>
                                             {user.activo && (
-                                                <button
-                                                    className="btn-danger"
-                                                    onClick={() => handleDeactivate(user.id)}
-                                                >
+                                                <button className="btn-danger" onClick={() => handleDeactivate(user.id)}>
                                                     Desactivar
                                                 </button>
                                             )}
@@ -134,15 +128,10 @@ export default function Users() {
                                 ))}
                             </tbody>
                         </table>
-
-                        <Pagination
-                            pagination={pagination}
-                            onPage={goToPage}
-                        />
+                        <Pagination pagination={pagination} onPage={handlePage} />
                     </>
                 )}
             </div>
-
         </AdminLayout>
     );
 }

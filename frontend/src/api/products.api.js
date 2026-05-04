@@ -1,13 +1,12 @@
 import { fetchWithAuth } from './fetchWithAuth';
 
+// src/api/products.api.js
 export const getProducts = async ({ page = 1, limit = 10, nombre, categoria } = {}) => {
     const params = new URLSearchParams({ page, limit });
-    if (nombre) params.append('nombre', nombre);
-    if (categoria) params.append('categoria', categoria);
-
+    if (nombre) params.append('name', nombre); 
+    if (categoria) params.append('category', categoria);
     return await fetchWithAuth(`/products?${params}`);
 };
-
 export const createProduct = async (data) => {
     return await fetchWithAuth('/products', {
         method: 'POST',
