@@ -1,13 +1,19 @@
 import { useState, useEffect, useCallback } from 'react';
 import AdminLayout from '../../components/AdminLayout';
 import Pagination from '../../components/Pagination';
-import { getWallets } from '../../api/wallets.api';
+import Modal from '../../components/Modal';
+import { getWallets, updateWallet } from '../../api/wallets.api';
 import { usePagination } from '../../hooks/usePagination';
 
 export default function Wallets() {
     const [wallets, setWallets] = useState([]);
     const [pagination, setPagination] = useState(null);
     const [loading, setLoading] = useState(true);
+    const [modal, setModal] = useState(false);
+    const [editing, setEditing] = useState(null);
+    const [amount, setAmount] = useState('');
+    const [saving, setSaving] = useState(false);
+    const [formError, setFormError] = useState('');
 
     const { page, goToPage } = usePagination();
 
@@ -15,7 +21,7 @@ export default function Wallets() {
         setLoading(true);
         try {
             const res = await getWallets({ page });
-            setWallets(res.data);
+            setWallets(res.data.data);
             setPagination(res.pagination);
         } catch (err) {
             console.error(err);
@@ -25,6 +31,28 @@ export default function Wallets() {
     }, [page]);
 
     useEffect(() => { fetchWallets(); }, [fetchWallets]);
+
+    const openEdit = (wallet) => {
+        setEditing(wallet);
+        setAmount(wallet.monto);
+        setFormError('');
+        setModal(true);
+    };
+
+    const handleSubmit = async (e) => {
+        e.preventDefault();
+        setSaving(true);
+        setFormError('');
+        try {
+            await updateWallet(editing.id, parseFloat(amount));
+            setModal(false);
+            fetchWallets();
+        } catch (err) {
+            setFormError(err.message);
+        } finally {
+            setSaving(false);
+        }
+    };
 
     return (
         <AdminLayout title="Billeteras">
@@ -46,6 +74,7 @@ export default function Wallets() {
                                     <th>Usuario</th>
                                     <th>Saldo</th>
                                     <th>Fecha creación</th>
+                                    <th>Acciones</th>
                                 </tr>
                             </thead>
                             <tbody>
@@ -62,6 +91,15 @@ export default function Wallets() {
                                             </span>
                                         </td>
                                         <td>{new Date(w.fecha_creacion).toLocaleDateString('es-GT')}</td>
+                                        <td>
+                                            <button
+                                                className="btn-secondary"
+                                                style={{ padding: '0.35rem 0.75rem', fontSize: '0.8rem' }}
+                                                onClick={() => openEdit(w)}
+                                            >
+                                                Editar monto
+                                            </button>
+                                        </td>
                                     </tr>
                                 ))}
                             </tbody>
@@ -70,6 +108,52 @@ export default function Wallets() {
                     </>
                 )}
             </div>
+
+            {modal && editing && (
+                <Modal
+                    title={`Editar billetera de ${editing.usuario}`}
+                    onClose={() => setModal(false)}
+                >
+                    <form className="modal-form" onSubmit={handleSubmit}>
+                        {formError && <div className="error-message">{formError}</div>}
+
+                        <div style={{
+                            background: 'var(--card2)',
+                            border: '1px solid var(--border)',
+                            borderRadius: '8px',
+                            padding: '1rem',
+                            textAlign: 'center'
+                        }}>
+                            <p style={{ color: 'var(--gray)', fontSize: '0.85rem' }}>Saldo actual</p>
+                            <p style={{ color: 'var(--green)', fontSize: '1.8rem', fontWeight: 700 }}>
+                                Q{parseFloat(editing.monto).toFixed(2)}
+                            </p>
+                        </div>
+
+                        <div className="form-group">
+                            <label>Nuevo monto (Q)</label>
+                            <input
+                                type="number"
+                                step="0.01"
+                                min="0"
+                                value={amount}
+                                onChange={e => setAmount(e.target.value)}
+                                placeholder="0.00"
+                                required
+                            />
+                        </div>
+
+                        <div className="modal-actions">
+                            <button type="button" className="btn-secondary" onClick={() => setModal(false)}>
+                                Cancelar
+                            </button>
+                            <button type="submit" className="btn-primary" disabled={saving}>
+                                {saving ? 'Guardando...' : 'Actualizar monto'}
+                            </button>
+                        </div>
+                    </form>
+                </Modal>
+            )}
         </AdminLayout>
     );
 }
