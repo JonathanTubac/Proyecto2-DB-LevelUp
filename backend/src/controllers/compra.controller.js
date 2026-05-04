@@ -53,7 +53,7 @@ export const getUserCompras = async (req, res, next) => {
 export const getMyReport = async (req, res, next) => {
   try {
     const { fecha_inicio, fecha_fin } = req.query;
-    const report = await purchaseService.getMyReport(
+    const report = await compraService.getMyReport(
       req.user.id,
       { fecha_inicio, fecha_fin }
     );

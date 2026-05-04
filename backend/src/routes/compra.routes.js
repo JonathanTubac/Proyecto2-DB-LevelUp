@@ -6,6 +6,8 @@ import { purchaseSchema } from '../schemas/purchase.schema.js';
 
 const router = Router();
 
+router.get('/report', protect, ctrl.getMyReport);
+
 /**
  * @swagger
  * /api/v1/purchases:
@@ -193,6 +195,4 @@ router.get('/:id', protect, ctrl.getById);
  */
 router.post('/', protect, validate(purchaseSchema), ctrl.create);
 
-
-router.get('/report', protect, ctrl.getMyReport);
 export default router;

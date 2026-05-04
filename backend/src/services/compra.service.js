@@ -123,5 +123,5 @@ export const getMyCompras = async (userId, query) => {
 };
 
 export const getMyReport = async (userId, filters) => {
-  return await purchaseRepo.getReportByUserId(userId, filters);
+  return await compraRepo.getReportByUserId(userId, filters);
 };
