@@ -85,8 +85,18 @@ LevelUp/
 ## Option 1 — Docker (recommended)
 
 This is the simplest way to run the entire stack (database, API, and frontend) with a single command.
+### 1. Clone this repository
 
-### 1. Create the root `.env` file
+```bash
+git clone https://github.com/JonathanTubac/Proyecto2-DB-LevelUp.git
+```
+### 2. Create the docker-compose.yml
+
+```bash
+cp docker-compose.yml.example docker-compose.yml
+```
+
+### 3. Create the root `.env` file
 
 Copy the example file and fill in your values:
 
@@ -122,10 +132,10 @@ VITE_API_URL=http://localhost:3000/api/v1
 
 > **Important:** `DB_HOST` must stay as `postgres` (the Docker service name). Do not change it.
 
-### 2. Build and start
+### 4. Build and start
 
 ```bash
-docker compose up --build
+docker compose up -d --build
 ```
 
 On the first run Docker will:
@@ -134,7 +144,7 @@ On the first run Docker will:
 3. Build the frontend image (Nginx serving the React build)
 4. Wait for the database health check before starting the API
 
-### 3. Access the app
+### 5. Access the app
 
 | Service | URL |
 |---|---|
@@ -156,7 +166,6 @@ docker compose down -v
 ```
 
 ---
-
 ## Option 2 — Local Development
 
 Run each service manually. You need PostgreSQL 16 already installed and running.
