@@ -92,16 +92,28 @@ git clone https://github.com/JonathanTubac/Proyecto2-DB-LevelUp.git
 ```
 ### 2. Create the docker-compose.yml
 
+**Linux / macOS:**
 ```bash
 cp docker-compose.yml.example docker-compose.yml
+```
+
+**Windows (PowerShell):**
+```powershell
+Copy-Item docker-compose.yml.example docker-compose.yml
 ```
 
 ### 3. Create the root `.env` file
 
 Copy the example file and fill in your values:
 
+**Linux / macOS:**
 ```bash
 cp .env.example .env
+```
+
+**Windows (PowerShell):**
+```powershell
+Copy-Item .env.example .env
 ```
 
 `.env` content:
@@ -187,9 +199,16 @@ psql -U your_user -d levelup -f backend/src/db/init/insercion.sql
 
 ### 2. Configure the backend
 
+**Linux / macOS:**
 ```bash
 cd backend
 cp .env.example .env
+```
+
+**Windows (PowerShell):**
+```powershell
+cd backend
+Copy-Item .env.example .env
 ```
 
 Edit `backend/.env`:
