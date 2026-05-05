@@ -12,7 +12,7 @@ services:
       POSTGRES_PASSWORD: ${DB_PASSWORD}
       POSTGRES_DB:       ${DB_NAME}
     ports:
-      - "5432:5432"
+      - "5433:5432"
     volumes:
       - postgres_data:/var/lib/postgresql/data
       - ./backend/src/db/init:/docker-entrypoint-initdb.d
@@ -28,7 +28,7 @@ services:
     container_name: levelup_api
     restart: unless-stopped
     ports:
-      - "${PORT}:${PORT}"
+      - "3001:3000"
     env_file:
       - .env
     environment:
@@ -48,7 +48,7 @@ services:
     container_name: levelup_frontend
     restart: unless-stopped
     ports:
-      - "5173:80"
+      - "8080:80"
     depends_on:
       - api
 

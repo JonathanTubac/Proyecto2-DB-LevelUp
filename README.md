@@ -146,10 +146,10 @@ JWT_REFRESH_SECRET=your_refresh_token_secret
 JWT_REFRESH_EXPIRES_IN=7d
 
 # CORS
-FRONTEND_URL=http://localhost:5173
+FRONTEND_URL=http://localhost:8080
 
 # Passed as build arg to the frontend container
-VITE_API_URL=http://localhost:3000/api/v1
+VITE_API_URL=http://localhost:3001/api/v1
 ```
 
 > **Important:** `DB_HOST` must stay as `postgres` (the Docker service name). Do not change it.
@@ -170,10 +170,10 @@ On the first run Docker will:
 
 | Service | URL |
 |---|---|
-| Frontend | http://localhost:5173 |
-| API | http://localhost:3000/api/v1 |
-| Swagger docs | http://localhost:3000/api-docs |
-| PostgreSQL | localhost:5432 |
+| Frontend | http://localhost:8080 |
+| API | http://localhost:3001/api/v1 |
+| Swagger docs | http://localhost:3001/api-docs |
+| PostgreSQL | localhost:5433 |
 
 ### Stop the stack
 
