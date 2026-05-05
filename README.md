@@ -102,6 +102,11 @@ cp docker-compose.yml.example docker-compose.yml
 Copy-Item docker-compose.yml.example docker-compose.yml
 ```
 
+**Windows (CMD):**
+```cmd
+copy docker-compose.yml.example docker-compose.yml
+```
+
 ### 3. Create the root `.env` file
 
 Copy the example file and fill in your values:
@@ -114,6 +119,11 @@ cp .env.example .env
 **Windows (PowerShell):**
 ```powershell
 Copy-Item .env.example .env
+```
+
+**Windows (CMD):**
+```cmd
+copy .env.example .env
 ```
 
 `.env` content:
@@ -209,6 +219,12 @@ cp .env.example .env
 ```powershell
 cd backend
 Copy-Item .env.example .env
+```
+
+**Windows (CMD):**
+```cmd
+cd backend
+copy .env.example .env
 ```
 
 Edit `backend/.env`:
