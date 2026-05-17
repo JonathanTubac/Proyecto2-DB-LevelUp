@@ -2,6 +2,7 @@ import { useState, useEffect } from 'react';
 import AdminLayout from '../../components/AdminLayout';
 import Pagination from '../../components/Pagination';
 import { getUsers, deactivateUser } from '../../api/users.api';
+import { Loader2, Users as UsersIcon, PowerOff, Search } from 'lucide-react';
 
 export default function Users() {
     const [users, setUsers] = useState([]);
@@ -80,9 +81,9 @@ export default function Users() {
                 {error && <p style={{ color: 'var(--red)', padding: '1rem' }}>{error}</p>}
 
                 {loading ? (
-                    <div className="empty-state"><p>⏳</p>Cargando...</div>
+                    <div className="empty-state"><Loader2 size={28} />Cargando...</div>
                 ) : users.length === 0 ? (
-                    <div className="empty-state"><p>👥</p>No hay usuarios</div>
+                    <div className="empty-state"><UsersIcon size={28} />No hay usuarios</div>
                 ) : (
                     <>
                         <table>
@@ -119,8 +120,8 @@ export default function Users() {
                                         </td>
                                         <td>
                                             {user.activo && (
-                                                <button className="btn-danger" onClick={() => handleDeactivate(user.id)}>
-                                                    Desactivar
+                                                <button className="btn-danger" style={{ display: 'flex', alignItems: 'center', gap: '0.3rem' }} onClick={() => handleDeactivate(user.id)}>
+                                                    <PowerOff size={13} /> Desactivar
                                                 </button>
                                             )}
                                         </td>

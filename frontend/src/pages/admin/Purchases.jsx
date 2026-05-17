@@ -3,6 +3,7 @@ import AdminLayout from '../../components/AdminLayout';
 import Pagination from '../../components/Pagination';
 import Modal from '../../components/Modal';
 import { getPurchases, getPurchaseById } from '../../api/purchases.api';
+import { Loader2, ShoppingCart, Eye } from 'lucide-react';
 
 export default function Purchases() {
     const [purchases, setPurchases] = useState([]);
@@ -61,9 +62,9 @@ export default function Purchases() {
                 </div>
 
                 {loading ? (
-                    <div className="empty-state"><p>⏳</p>Cargando...</div>
+                    <div className="empty-state"><Loader2 size={28} />Cargando...</div>
                 ) : purchases.length === 0 ? (
-                    <div className="empty-state"><p>🛒</p>No hay compras</div>
+                    <div className="empty-state"><ShoppingCart size={28} />No hay compras</div>
                 ) : (
                     <>
                         <table>
@@ -94,10 +95,10 @@ export default function Purchases() {
                                         <td>
                                             <button
                                                 className="btn-secondary"
-                                                style={{ padding: '0.35rem 0.75rem', fontSize: '0.8rem' }}
+                                                style={{ padding: '0.35rem 0.75rem', fontSize: '0.8rem', display: 'flex', alignItems: 'center', gap: '0.3rem' }}
                                                 onClick={() => openDetail(p.id)}
                                             >
-                                                Ver detalle
+                                                <Eye size={13} /> Ver detalle
                                             </button>
                                         </td>
                                     </tr>

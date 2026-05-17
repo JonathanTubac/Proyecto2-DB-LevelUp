@@ -1,15 +1,16 @@
 import { NavLink, useNavigate } from 'react-router-dom';
 import { useAuth } from '../hooks/useAuth';
 import { logoutRequest } from '../api/auth.api';
+import { LayoutDashboard, Users, Gamepad2, FolderOpen, Truck, ShoppingCart, Wallet, LogOut } from 'lucide-react';
 
 const navItems = [
-    { to: '/admin', icon: '📊', label: 'Dashboard' },
-    { to: '/admin/users', icon: '👥', label: 'Usuarios' },
-    { to: '/admin/products', icon: '🎮', label: 'Productos' },
-    { to: '/admin/categories', icon: '📁', label: 'Categorías' },
-    { to: '/admin/providers', icon: '🏭', label: 'Proveedores' },
-    { to: '/admin/purchases', icon: '🛒', label: 'Compras' },
-    { to: '/admin/wallets', icon: '💳', label: 'Billeteras' },
+    { to: '/admin', icon: <LayoutDashboard size={18} />, label: 'Dashboard' },
+    { to: '/admin/users', icon: <Users size={18} />, label: 'Usuarios' },
+    { to: '/admin/products', icon: <Gamepad2 size={18} />, label: 'Productos' },
+    { to: '/admin/categories', icon: <FolderOpen size={18} />, label: 'Categorías' },
+    { to: '/admin/providers', icon: <Truck size={18} />, label: 'Proveedores' },
+    { to: '/admin/purchases', icon: <ShoppingCart size={18} />, label: 'Compras' },
+    { to: '/admin/wallets', icon: <Wallet size={18} />, label: 'Billeteras' },
 ];
 
 export default function Sidebar() {
@@ -59,7 +60,7 @@ export default function Sidebar() {
                     </div>
                 </div>
                 <button className="btn-logout" onClick={handleLogout}>
-                    Cerrar sesión
+                    <LogOut size={15} /> Cerrar sesión
                 </button>
             </div>
         </aside>

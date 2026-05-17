@@ -3,6 +3,7 @@ import AdminLayout from '../../components/AdminLayout';
 import Pagination from '../../components/Pagination';
 import Modal from '../../components/Modal';
 import { getProviders, createProvider, updateProvider, deactivateProvider } from '../../api/providers.api';
+import { Loader2, Truck, Plus, Pencil, PowerOff, Search } from 'lucide-react';
 
 export default function Providers() {
     const [providers, setProviders] = useState([]);
@@ -78,14 +79,14 @@ export default function Providers() {
                             value={search}
                             onChange={handleSearch}
                         />
-                        <button className="btn-primary" onClick={openCreate}>+ Nuevo proveedor</button>
+                        <button className="btn-primary" onClick={openCreate} style={{ display: 'flex', alignItems: 'center', gap: '0.4rem' }}><Plus size={16} /> Nuevo proveedor</button>
                     </div>
                 </div>
 
                 {loading ? (
-                    <div className="empty-state"><p>⏳</p>Cargando...</div>
+                    <div className="empty-state"><Loader2 size={28} />Cargando...</div>
                 ) : providers.length === 0 ? (
-                    <div className="empty-state"><p>🏭</p>No hay proveedores</div>
+                    <div className="empty-state"><Truck size={28} />No hay proveedores</div>
                 ) : (
                     <>
                         <table>
@@ -110,14 +111,14 @@ export default function Providers() {
                                         <td style={{ display: 'flex', gap: '0.5rem' }}>
                                             <button
                                                 className="btn-secondary"
-                                                style={{ padding: '0.35rem 0.75rem', fontSize: '0.8rem' }}
+                                                style={{ padding: '0.35rem 0.75rem', fontSize: '0.8rem', display: 'flex', alignItems: 'center', gap: '0.3rem' }}
                                                 onClick={() => openEdit(p)}
                                             >
-                                                Editar
+                                                <Pencil size={13} /> Editar
                                             </button>
                                             {p.activo && (
-                                                <button className="btn-danger" onClick={() => handleDeactivate(p.id)}>
-                                                    Desactivar
+                                                <button className="btn-danger" style={{ display: 'flex', alignItems: 'center', gap: '0.3rem' }} onClick={() => handleDeactivate(p.id)}>
+                                                    <PowerOff size={13} /> Desactivar
                                                 </button>
                                             )}
                                         </td>

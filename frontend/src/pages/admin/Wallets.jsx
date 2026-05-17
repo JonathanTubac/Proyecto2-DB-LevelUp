@@ -4,6 +4,7 @@ import Pagination from '../../components/Pagination';
 import Modal from '../../components/Modal';
 import { getWallets, updateWallet } from '../../api/wallets.api';
 import { usePagination } from '../../hooks/usePagination';
+import { Loader2, Wallet as WalletIcon, Pencil } from 'lucide-react';
 
 export default function Wallets() {
     const [wallets, setWallets] = useState([]);
@@ -62,9 +63,9 @@ export default function Wallets() {
                 </div>
 
                 {loading ? (
-                    <div className="empty-state"><p>⏳</p>Cargando...</div>
+                    <div className="empty-state"><Loader2 size={28} />Cargando...</div>
                 ) : wallets.length === 0 ? (
-                    <div className="empty-state"><p>💳</p>No hay billeteras</div>
+                    <div className="empty-state"><WalletIcon size={28} />No hay billeteras</div>
                 ) : (
                     <>
                         <table>
@@ -94,10 +95,10 @@ export default function Wallets() {
                                         <td>
                                             <button
                                                 className="btn-secondary"
-                                                style={{ padding: '0.35rem 0.75rem', fontSize: '0.8rem' }}
+                                                style={{ padding: '0.35rem 0.75rem', fontSize: '0.8rem', display: 'flex', alignItems: 'center', gap: '0.3rem' }}
                                                 onClick={() => openEdit(w)}
                                             >
-                                                Editar monto
+                                                <Pencil size={13} /> Editar monto
                                             </button>
                                         </td>
                                     </tr>

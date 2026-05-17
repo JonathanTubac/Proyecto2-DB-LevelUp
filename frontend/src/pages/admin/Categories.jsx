@@ -3,6 +3,7 @@ import AdminLayout from '../../components/AdminLayout';
 import Pagination from '../../components/Pagination';
 import Modal from '../../components/Modal';
 import { getCategories, createCategory, updateCategory } from '../../api/categories.api';
+import { Loader2, FolderOpen, Plus, Pencil, Search } from 'lucide-react';
 
 export default function Categories() {
     const [categories, setCategories] = useState([]);
@@ -68,14 +69,14 @@ export default function Categories() {
                             value={search}
                             onChange={handleSearch}
                         />
-                        <button className="btn-primary" onClick={openCreate}>+ Nueva categoría</button>
+                        <button className="btn-primary" onClick={openCreate} style={{ display: 'flex', alignItems: 'center', gap: '0.4rem' }}><Plus size={16} /> Nueva categoría</button>
                     </div>
                 </div>
 
                 {loading ? (
-                    <div className="empty-state"><p>⏳</p>Cargando...</div>
+                    <div className="empty-state"><Loader2 size={28} />Cargando...</div>
                 ) : categories.length === 0 ? (
-                    <div className="empty-state"><p>📁</p>No hay categorías</div>
+                    <div className="empty-state"><FolderOpen size={28} />No hay categorías</div>
                 ) : (
                     <>
                         <table>
@@ -94,10 +95,10 @@ export default function Categories() {
                                         <td>
                                             <button
                                                 className="btn-secondary"
-                                                style={{ padding: '0.35rem 0.75rem', fontSize: '0.8rem' }}
+                                                style={{ padding: '0.35rem 0.75rem', fontSize: '0.8rem', display: 'flex', alignItems: 'center', gap: '0.3rem' }}
                                                 onClick={() => openEdit(cat)}
                                             >
-                                                Editar
+                                                <Pencil size={13} /> Editar
                                             </button>
                                         </td>
                                     </tr>

@@ -1,4 +1,5 @@
 import { useEffect } from 'react';
+import { X } from 'lucide-react';
 import '../../src/styles/modal.css';
 
 export default function Modal({ title, onClose, children }) {
@@ -16,7 +17,7 @@ export default function Modal({ title, onClose, children }) {
       <div className="modal-card" onClick={e => e.stopPropagation()}>
         <div className="modal-header">
           <h3>{title}</h3>
-          <button className="modal-close" onClick={onClose}>✕</button>
+          <button className="modal-close" onClick={onClose}><X size={18} /></button>
         </div>
         <div className="modal-body">
           {children}
