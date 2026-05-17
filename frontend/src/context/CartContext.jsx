@@ -1,41 +1,54 @@
-import { createContext, useState, useContext } from 'react';
+import { createContext, useReducer, useContext } from 'react';
 
 const CartContext = createContext(null);
 
-export const CartProvider = ({ children }) => {
-    const [cart, setCart] = useState([]);
-
-    const addToCart = (product, cantidad = 1) => {
-        setCart(prev => {
-            const exists = prev.find(item => item.id === product.id);
+function cartReducer(state, action) {
+    switch (action.type) {
+        case 'ADD': {
+            const exists = state.find(item => item.id === action.product.id);
             if (exists) {
-                const newCantidad = exists.cantidad + cantidad;
-                if (newCantidad > product.stock) return prev;
-                return prev.map(item =>
-                    item.id === product.id
+                const newCantidad = exists.cantidad + action.cantidad;
+                if (newCantidad > action.product.stock) return state;
+                return state.map(item =>
+                    item.id === action.product.id
                         ? { ...item, cantidad: newCantidad }
                         : item
                 );
             }
-            return [...prev, { ...product, cantidad }];
-        });
-    };
+            return [...state, { ...action.product, cantidad: action.cantidad }];
+        }
+        case 'REMOVE':
+            return state.filter(item => item.id !== action.productId);
+        case 'UPDATE': {
+            if (action.cantidad < 1)
+                return state.filter(item => item.id !== action.productId);
+            if (action.cantidad > action.stock) return state;
+            return state.map(item =>
+                item.id === action.productId
+                    ? { ...item, cantidad: action.cantidad }
+                    : item
+            );
+        }
+        case 'CLEAR':
+            return [];
+        default:
+            return state;
+    }
+}
 
-    const removeFromCart = (productId) => {
-        setCart(prev => prev.filter(item => item.id !== productId));
-    };
+export const CartProvider = ({ children }) => {
+    const [cart, dispatch] = useReducer(cartReducer, []);
 
-    const updateCantidad = (productId, cantidad, stock) => {
-        if (cantidad < 1) return removeFromCart(productId);
-        if (cantidad > stock) return;
-        setCart(prev =>
-            prev.map(item =>
-                item.id === productId ? { ...item, cantidad } : item
-            )
-        );
-    };
+    const addToCart = (product, cantidad = 1) =>
+        dispatch({ type: 'ADD', product, cantidad });
 
-    const clearCart = () => setCart([]);
+    const removeFromCart = (productId) =>
+        dispatch({ type: 'REMOVE', productId });
+
+    const updateCantidad = (productId, cantidad, stock) =>
+        dispatch({ type: 'UPDATE', productId, cantidad, stock });
+
+    const clearCart = () => dispatch({ type: 'CLEAR' });
 
     const total = cart.reduce((acc, item) => acc + item.precio * item.cantidad, 0);
     const totalItems = cart.reduce((acc, item) => acc + item.cantidad, 0);
