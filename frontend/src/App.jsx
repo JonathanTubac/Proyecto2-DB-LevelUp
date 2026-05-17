@@ -1,5 +1,6 @@
 import { BrowserRouter, Routes, Route, Navigate } from 'react-router-dom';
 import { AuthProvider } from './context/AuthContext';
+import { ToastProvider } from './context/ToastContext';
 import { ProtectedRoute } from './components/ProtectedRoute';
 import Login from './pages/Login';
 import Dashboard from './pages/admin/Dashboard';
@@ -27,6 +28,7 @@ const ClientRoute = ({ children }) => (
 function App() {
   return (
     <AuthProvider>
+      <ToastProvider>
       <CartProvider>
         <BrowserRouter>
           <Routes>
@@ -56,6 +58,7 @@ function App() {
           </Routes>
         </BrowserRouter>
       </CartProvider>
+      </ToastProvider>
     </AuthProvider>
   );
 }

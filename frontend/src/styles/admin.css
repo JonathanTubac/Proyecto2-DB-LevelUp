@@ -168,8 +168,14 @@
 }
 
 .admin-content {
-  padding: 1.5rem;
-  flex:    1;
+  padding:   1.5rem;
+  flex:      1;
+  animation: page-fade 0.22s ease;
+}
+
+@keyframes page-fade {
+  from { opacity: 0; transform: translateY(8px); }
+  to   { opacity: 1; transform: translateY(0); }
 }
 
 .stats-grid {
@@ -256,10 +262,11 @@ th {
 }
 
 td {
-  padding:     0.85rem 1.25rem;
-  font-size:   0.9rem;
-  border-top:  1px solid var(--border);
-  color:       var(--white);
+  padding:          0.85rem 1.25rem;
+  font-size:        0.9rem;
+  border-top:       1px solid var(--border);
+  color:            var(--white);
+  transition:       background-color 0.15s ease;
 }
 
 tr:hover td {

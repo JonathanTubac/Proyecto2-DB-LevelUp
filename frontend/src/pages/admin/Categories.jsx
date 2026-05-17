@@ -4,8 +4,10 @@ import Pagination from '../../components/Pagination';
 import Modal from '../../components/Modal';
 import { getCategories, createCategory, updateCategory } from '../../api/categories.api';
 import { Loader2, FolderOpen, Plus, Pencil, Search } from 'lucide-react';
+import { useToast } from '../../context/ToastContext';
 
 export default function Categories() {
+    const { showToast } = useToast();
     const [categories, setCategories] = useState([]);
     const [pagination, setPagination] = useState(null);
     const [loading, setLoading] = useState(true);
@@ -45,8 +47,13 @@ export default function Categories() {
         setSaving(true);
         setFormError('');
         try {
-            if (editing) await updateCategory(editing.id, form);
-            else await createCategory(form);
+            if (editing) {
+                await updateCategory(editing.id, form);
+                showToast('Categoría actualizada correctamente');
+            } else {
+                await createCategory(form);
+                showToast('Categoría creada correctamente');
+            }
             setModal(false);
             setPage(1);
             setSearch('');

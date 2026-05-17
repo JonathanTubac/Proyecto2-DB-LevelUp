@@ -5,8 +5,10 @@ import Modal from '../../components/Modal';
 import { getWallets, updateWallet } from '../../api/wallets.api';
 import { usePagination } from '../../hooks/usePagination';
 import { Loader2, Wallet as WalletIcon, Pencil } from 'lucide-react';
+import { useToast } from '../../context/ToastContext';
 
 export default function Wallets() {
+    const { showToast } = useToast();
     const [wallets, setWallets] = useState([]);
     const [pagination, setPagination] = useState(null);
     const [loading, setLoading] = useState(true);
@@ -46,6 +48,7 @@ export default function Wallets() {
         setFormError('');
         try {
             await updateWallet(editing.id, parseFloat(amount));
+            showToast('Saldo actualizado correctamente');
             setModal(false);
             fetchWallets();
         } catch (err) {

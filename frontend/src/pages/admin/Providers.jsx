@@ -4,8 +4,11 @@ import Pagination from '../../components/Pagination';
 import Modal from '../../components/Modal';
 import { getProviders, createProvider, updateProvider, deactivateProvider } from '../../api/providers.api';
 import { Loader2, Truck, Plus, Pencil, PowerOff, Search } from 'lucide-react';
+import ConfirmModal from '../../components/ConfirmModal';
+import { useToast } from '../../context/ToastContext';
 
 export default function Providers() {
+    const { showToast } = useToast();
     const [providers, setProviders] = useState([]);
     const [pagination, setPagination] = useState(null);
     const [loading, setLoading] = useState(true);
@@ -16,6 +19,7 @@ export default function Providers() {
     const [form, setForm] = useState({ name: '' });
     const [saving, setSaving] = useState(false);
     const [formError, setFormError] = useState('');
+    const [confirm, setConfirm] = useState(null);
 
     useEffect(() => {
         const timer = setTimeout(async () => {
@@ -45,8 +49,13 @@ export default function Providers() {
         setSaving(true);
         setFormError('');
         try {
-            if (editing) await updateProvider(editing.id, form);
-            else await createProvider(form);
+            if (editing) {
+                await updateProvider(editing.id, form);
+                showToast('Proveedor actualizado correctamente');
+            } else {
+                await createProvider(form);
+                showToast('Proveedor creado correctamente');
+            }
             setModal(false);
             setPage(1);
             setSearch('');
@@ -57,14 +66,19 @@ export default function Providers() {
         }
     };
 
-    const handleDeactivate = async (id) => {
-        if (!confirm('¿Desactivar este proveedor?')) return;
-        try {
-            await deactivateProvider(id);
-            setPage(1);
-        } catch (err) {
-            alert(err.message);
-        }
+    const handleDeactivate = (id) => {
+        setConfirm({
+            onConfirm: async () => {
+                setConfirm(null);
+                try {
+                    await deactivateProvider(id);
+                    showToast('Proveedor desactivado');
+                    setPage(1);
+                } catch (err) {
+                    showToast(err.message, 'error');
+                }
+            },
+        });
     };
 
     return (
@@ -130,6 +144,16 @@ export default function Providers() {
                     </>
                 )}
             </div>
+
+            {confirm && (
+                <ConfirmModal
+                    title="Desactivar proveedor"
+                    message="¿Seguro que deseas desactivar este proveedor?"
+                    confirmLabel="Desactivar"
+                    onConfirm={confirm.onConfirm}
+                    onClose={() => setConfirm(null)}
+                />
+            )}
 
             {modal && (
                 <Modal title={editing ? 'Editar proveedor' : 'Nuevo proveedor'} onClose={() => setModal(false)}>

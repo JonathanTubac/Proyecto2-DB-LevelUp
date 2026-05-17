@@ -5,10 +5,13 @@ import Modal from '../../components/Modal';
 import { getProducts, createProduct, updateProduct, deactivateProduct } from '../../api/products.api';
 import { getCategories } from '../../api/categories.api';
 import { Loader2, Gamepad2, Plus, Pencil, PowerOff, Search } from 'lucide-react';
+import ConfirmModal from '../../components/ConfirmModal';
+import { useToast } from '../../context/ToastContext';
 
 const emptyForm = { name: '', price: '', stock: '', id_category: '' };
 
 export default function Products() {
+    const { showToast } = useToast();
     const [products, setProducts] = useState([]);
     const [categories, setCategories] = useState([]);
     const [pagination, setPagination] = useState(null);
@@ -21,6 +24,7 @@ export default function Products() {
     const [form, setForm] = useState(emptyForm);
     const [saving, setSaving] = useState(false);
     const [formError, setFormError] = useState('');
+    const [confirm, setConfirm] = useState(null);
 
     useEffect(() => {
         getCategories({ limit: 50 })
@@ -86,8 +90,13 @@ export default function Products() {
                 stock: parseInt(form.stock),
                 id_category: parseInt(form.id_category),
             };
-            if (editing) await updateProduct(editing.id, payload);
-            else await createProduct(payload);
+            if (editing) {
+                await updateProduct(editing.id, payload);
+                showToast('Producto actualizado correctamente');
+            } else {
+                await createProduct(payload);
+                showToast('Producto creado correctamente');
+            }
             closeModal();
             setPage(1);
             setSearch('');
@@ -98,14 +107,20 @@ export default function Products() {
         }
     };
 
-    const handleDeactivate = async (id) => {
-        if (!confirm('¿Desactivar este producto?')) return;
-        try {
-            await deactivateProduct(id);
-            setPage(1);
-        } catch (err) {
-            alert(err.message);
-        }
+    const handleDeactivate = (id) => {
+        setConfirm({
+            message: '¿Seguro que deseas desactivar este producto? Ya no será visible en la tienda.',
+            onConfirm: async () => {
+                setConfirm(null);
+                try {
+                    await deactivateProduct(id);
+                    showToast('Producto desactivado');
+                    setPage(1);
+                } catch (err) {
+                    showToast(err.message, 'error');
+                }
+            },
+        });
     };
 
     return (
@@ -185,6 +200,16 @@ export default function Products() {
                     </>
                 )}
             </div>
+
+            {confirm && (
+                <ConfirmModal
+                    title="Desactivar producto"
+                    message={confirm.message}
+                    confirmLabel="Desactivar"
+                    onConfirm={confirm.onConfirm}
+                    onClose={() => setConfirm(null)}
+                />
+            )}
 
             {modal && (
                 <Modal title={editing ? 'Editar producto' : 'Nuevo producto'} onClose={closeModal}>

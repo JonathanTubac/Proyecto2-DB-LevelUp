@@ -3,8 +3,11 @@ import AdminLayout from '../../components/AdminLayout';
 import Pagination from '../../components/Pagination';
 import { getUsers, deactivateUser } from '../../api/users.api';
 import { Loader2, Users as UsersIcon, PowerOff, Search } from 'lucide-react';
+import ConfirmModal from '../../components/ConfirmModal';
+import { useToast } from '../../context/ToastContext';
 
 export default function Users() {
+    const { showToast } = useToast();
     const [users, setUsers] = useState([]);
     const [pagination, setPagination] = useState(null);
     const [loading, setLoading] = useState(true);
@@ -12,6 +15,7 @@ export default function Users() {
     const [search, setSearch] = useState('');
     const [rolFilter, setRolFilter] = useState('');
     const [page, setPage] = useState(1);
+    const [confirm, setConfirm] = useState(null);
 
     useEffect(() => {
         const timer = setTimeout(async () => {
@@ -42,14 +46,19 @@ export default function Users() {
     const handleRolFilter = (e) => { setRolFilter(e.target.value); setPage(1); };
     const handlePage = (p) => setPage(p);
 
-    const handleDeactivate = async (id) => {
-        if (!confirm('¿Desactivar este usuario?')) return;
-        try {
-            await deactivateUser(id);
-            setPage(1);
-        } catch (err) {
-            alert(err.message);
-        }
+    const handleDeactivate = (id) => {
+        setConfirm({
+            onConfirm: async () => {
+                setConfirm(null);
+                try {
+                    await deactivateUser(id);
+                    showToast('Usuario desactivado');
+                    setPage(1);
+                } catch (err) {
+                    showToast(err.message, 'error');
+                }
+            },
+        });
     };
 
     return (
@@ -133,6 +142,15 @@ export default function Users() {
                     </>
                 )}
             </div>
+            {confirm && (
+                <ConfirmModal
+                    title="Desactivar usuario"
+                    message="¿Seguro que deseas desactivar este usuario? No podrá iniciar sesión."
+                    confirmLabel="Desactivar"
+                    onConfirm={confirm.onConfirm}
+                    onClose={() => setConfirm(null)}
+                />
+            )}
         </AdminLayout>
     );
 }
