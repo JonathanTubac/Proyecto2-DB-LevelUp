@@ -14,52 +14,52 @@ A full-stack web application for managing a gaming store. It covers product cata
 
 ---
 
-## Rubric Checklist (cc3062 Proyecto 2)
+## Rubric Checklist (cc3062 Project 2)
 
-### I. Arquitectura y API REST — 35/35 pts
+### I. Architecture & REST API — 35/35 pts
 
-| Criterio | Estado | Pts |
+| Criterion | Status | Pts |
 |---|---|---|
-| Endpoints REST documentados (Swagger/OpenAPI) | ✅ | 8 |
-| CRUD completo para ≥ 2 entidades (productos, categorías, proveedores, usuarios, compras) | ✅ | 15 |
-| Manejo de errores HTTP correctos + mensajes JSON | ✅ | 7 |
-| ≥ 1 endpoint que agrega datos (`/api/v1/dashboard`) | ✅ | 5 |
+| REST endpoints documented (Swagger/OpenAPI) | ✅ | 8 |
+| Full CRUD for ≥ 2 entities (products, categories, providers, users, purchases) | ✅ | 15 |
+| Correct HTTP error handling + JSON error responses | ✅ | 7 |
+| ≥ 1 data-aggregation endpoint (`/api/v1/dashboard`) | ✅ | 5 |
 
 ### II. Frontend — React — 53/53 pts
 
-| Criterio | Estado | Pts |
+| Criterion | Status | Pts |
 |---|---|---|
-| React Router con ≥ 4 rutas distintas (12 rutas implementadas) | ✅ | 8 |
-| Estado global con React Context (`AuthContext`, `CartContext`) | ✅ | 8 |
-| `useState`, `useEffect` y `useCallback`/`useMemo` | ✅ | 8 |
-| Flujo de estado complejo con `useReducer` (carrito de compras) | ✅ | 8 |
-| Formularios controlados con validación del lado del cliente | ✅ | 8 |
-| Reporte visible en UI con datos reales (Dashboard KPIs + tablas) | ✅ | 8 |
-| Manejo visible de errores para el usuario (toasts + mensajes) | ✅ | 5 |
+| React Router with ≥ 4 distinct routes (12 routes implemented) | ✅ | 8 |
+| Global state with React Context (`AuthContext`, `CartContext`) | ✅ | 8 |
+| `useState`, `useEffect`, and `useCallback`/`useMemo` | ✅ | 8 |
+| Complex state flow with `useReducer` (shopping cart) | ✅ | 8 |
+| Controlled forms with client-side validation | ✅ | 8 |
+| Visible report in UI with real data (Dashboard KPIs + tables) | ✅ | 8 |
+| Visible error handling for the user (toasts + messages) | ✅ | 5 |
 
-### III. Calidad de código — 12/12 pts
+### III. Code Quality — 12/12 pts
 
-| Criterio | Estado | Pts |
+| Criterion | Status | Pts |
 |---|---|---|
-| ESLint funcional (`eslint.config.js`) | ✅ | 5 |
-| ≥ 3 pruebas unitarias o de integración que pasen | ✅ | 7 |
+| Working ESLint (`eslint.config.js`) | ✅ | 5 |
+| ≥ 3 passing unit or integration tests | ✅ | 7 |
 
-### IV. Despliegue y entrega — 15/15 pts
+### IV. Deployment & Delivery — 15/15 pts
 
-| Criterio | Estado | Pts |
+| Criterion | Status | Pts |
 |---|---|---|
-| README con instrucciones funcionales + `docker compose up` | ✅ | 5 |
-| Proyecto levanta correctamente con `docker compose up` | ✅ | 10 |
+| README with working instructions + `docker compose up` | ✅ | 5 |
+| Project starts correctly with `docker compose up` | ✅ | 10 |
 
-### V. Avanzado — 20/20 pts
+### V. Advanced — 20/20 pts
 
-| Criterio | Estado | Pts |
+| Criterion | Status | Pts |
 |---|---|---|
-| Autenticación con login/logout y sesión manejada con Context | ✅ | 10 |
-| Exportar reporte a PDF desde la UI | ✅ | 5 |
-| Diseño responsivo verificable en móvil y escritorio | ✅ | 5 |
+| Authentication with login/logout and session managed via Context | ✅ | 10 |
+| Export report to PDF from the UI | ✅ | 5 |
+| Responsive design verifiable on mobile and desktop | ✅ | 5 |
 
-> **Nota:** El proyecto está desplegado en producción en Vercel (ver sección Live Demo arriba).
+> **Note:** The project is deployed to production on Vercel (see Live Demo section above).
 
 ---
 
@@ -384,9 +384,9 @@ Interactive Swagger documentation is available at `http://localhost:3000/api-doc
 
 | Table | Description |
 |---|---|
-| `roles` | Administrador / Empleado / Cliente |
+| `roles` | Admin / Employee / Client |
 | `usuarios` | Registered users with role |
-| `empleados` | Employee profile (carnet, salary) |
+| `empleados` | Employee profile (ID card, salary) |
 | `productos` | Products with stock, price, category |
 | `categorias` | Product categories |
 | `proveedores` | Suppliers |
