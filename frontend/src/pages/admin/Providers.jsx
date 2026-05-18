@@ -20,6 +20,9 @@ export default function Providers() {
     const [saving, setSaving] = useState(false);
     const [formError, setFormError] = useState('');
     const [confirm, setConfirm] = useState(null);
+    const [tick, setTick] = useState(0);
+
+    const refetch = () => { setPage(1); setSearch(''); setTick(t => t + 1); };
 
     useEffect(() => {
         const timer = setTimeout(async () => {
@@ -36,7 +39,7 @@ export default function Providers() {
         }, search ? 500 : 0);
 
         return () => clearTimeout(timer);
-    }, [page, search]);
+    }, [page, search, tick]);
 
     const handleSearch = (e) => { setSearch(e.target.value); setPage(1); };
     const handlePage = (p) => setPage(p);
@@ -57,8 +60,7 @@ export default function Providers() {
                 showToast('Proveedor creado correctamente');
             }
             setModal(false);
-            setPage(1);
-            setSearch('');
+            refetch();
         } catch (err) {
             setFormError(err.message);
         } finally {
@@ -73,7 +75,7 @@ export default function Providers() {
                 try {
                     await deactivateProvider(id);
                     showToast('Proveedor desactivado');
-                    setPage(1);
+                    refetch();
                 } catch (err) {
                     showToast(err.message, 'error');
                 }

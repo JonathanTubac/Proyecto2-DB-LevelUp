@@ -16,6 +16,9 @@ export default function Users() {
     const [rolFilter, setRolFilter] = useState('');
     const [page, setPage] = useState(1);
     const [confirm, setConfirm] = useState(null);
+    const [tick, setTick] = useState(0);
+
+    const refetch = () => { setPage(1); setTick(t => t + 1); };
 
     useEffect(() => {
         const timer = setTimeout(async () => {
@@ -23,7 +26,6 @@ export default function Users() {
             setError('');
             try {
                 const res = await getUsers({ page, limit: 10, rol: rolFilter || undefined });
-                // filtro local por nombre/correo
                 const filtered = search
                     ? res.data.filter(u =>
                         u.nombre.toLowerCase().includes(search.toLowerCase()) ||
@@ -40,7 +42,7 @@ export default function Users() {
         }, search ? 500 : 0);
 
         return () => clearTimeout(timer);
-    }, [page, search, rolFilter]);
+    }, [page, search, rolFilter, tick]);
 
     const handleSearch = (e) => { setSearch(e.target.value); setPage(1); };
     const handleRolFilter = (e) => { setRolFilter(e.target.value); setPage(1); };
@@ -53,7 +55,7 @@ export default function Users() {
                 try {
                     await deactivateUser(id);
                     showToast('Usuario desactivado');
-                    setPage(1);
+                    refetch();
                 } catch (err) {
                     showToast(err.message, 'error');
                 }

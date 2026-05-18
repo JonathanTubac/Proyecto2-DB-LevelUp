@@ -18,6 +18,9 @@ export default function Categories() {
     const [form, setForm] = useState({ name: '' });
     const [saving, setSaving] = useState(false);
     const [formError, setFormError] = useState('');
+    const [tick, setTick] = useState(0);
+
+    const refetch = () => { setPage(1); setSearch(''); setTick(t => t + 1); };
 
     useEffect(() => {
         const timer = setTimeout(async () => {
@@ -34,7 +37,7 @@ export default function Categories() {
         }, search ? 500 : 0);
 
         return () => clearTimeout(timer);
-    }, [page, search]);
+    }, [page, search, tick]);
 
     const handleSearch = (e) => { setSearch(e.target.value); setPage(1); };
     const handlePage = (p) => setPage(p);
@@ -55,8 +58,7 @@ export default function Categories() {
                 showToast('Categoría creada correctamente');
             }
             setModal(false);
-            setPage(1);
-            setSearch('');
+            refetch();
         } catch (err) {
             setFormError(err.message);
         } finally {

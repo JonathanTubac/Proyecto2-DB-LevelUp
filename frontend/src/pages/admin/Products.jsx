@@ -25,6 +25,9 @@ export default function Products() {
     const [saving, setSaving] = useState(false);
     const [formError, setFormError] = useState('');
     const [confirm, setConfirm] = useState(null);
+    const [tick, setTick] = useState(0);
+
+    const refetch = () => { setPage(1); setSearch(''); setTick(t => t + 1); };
 
     useEffect(() => {
         getCategories({ limit: 50 })
@@ -48,7 +51,7 @@ export default function Products() {
         }, search ? 500 : 0);
 
         return () => clearTimeout(timer);
-    }, [page, search]);
+    }, [page, search, tick]);
 
     const handleSearch = (e) => { setSearch(e.target.value); setPage(1); };
     const handlePage = (p) => setPage(p);
@@ -98,8 +101,7 @@ export default function Products() {
                 showToast('Producto creado correctamente');
             }
             closeModal();
-            setPage(1);
-            setSearch('');
+            refetch();
         } catch (err) {
             setFormError(err.message);
         } finally {
@@ -115,7 +117,7 @@ export default function Products() {
                 try {
                     await deactivateProduct(id);
                     showToast('Producto desactivado');
-                    setPage(1);
+                    refetch();
                 } catch (err) {
                     showToast(err.message, 'error');
                 }
