@@ -3,7 +3,7 @@ import AdminLayout from '../../components/AdminLayout';
 import Pagination from '../../components/Pagination';
 import Modal from '../../components/Modal';
 import { getCategories, createCategory, updateCategory } from '../../api/categories.api';
-import { Loader2, FolderOpen, Plus, Pencil, Search } from 'lucide-react';
+import { Loader2, FolderOpen, Plus, Pencil } from 'lucide-react';
 import { useToast } from '../../context/ToastContext';
 
 export default function Categories() {

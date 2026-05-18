@@ -55,7 +55,7 @@ export default function Store() {
     useEffect(() => {
         const t = setTimeout(() => { setSearch(searchInput); reset(); }, 500);
         return () => clearTimeout(t);
-    }, [searchInput]);
+    }, [searchInput]); // eslint-disable-line react-hooks/exhaustive-deps
 
     const getQuantity = (productId) => quantities[productId] || 1;
 
@@ -63,8 +63,6 @@ export default function Store() {
         const q = Math.max(1, Math.min(stock, parseInt(val) || 1));
         setQuantities(prev => ({ ...prev, [productId]: q }));
     };
-
-    const inCart = (productId) => cart.some(item => item.id === productId);
 
     const cartQuantity = (productId) => {
         const item = cart.find(i => i.id === productId);
@@ -110,7 +108,6 @@ export default function Store() {
                 <>
                     <div className="products-grid">
                         {products.map(product => {
-                            const inC = inCart(product.id);
                             const cartQ = cartQuantity(product.id);
                             const maxQ = product.stock - cartQ;
 

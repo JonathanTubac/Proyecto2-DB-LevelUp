@@ -4,7 +4,7 @@ import Pagination from '../../components/Pagination';
 import Modal from '../../components/Modal';
 import { getProducts, createProduct, updateProduct, deactivateProduct } from '../../api/products.api';
 import { getCategories } from '../../api/categories.api';
-import { Loader2, Gamepad2, Plus, Pencil, PowerOff, Search } from 'lucide-react';
+import { Loader2, Gamepad2, Plus, Pencil, PowerOff } from 'lucide-react';
 import ConfirmModal from '../../components/ConfirmModal';
 import { useToast } from '../../context/ToastContext';
 

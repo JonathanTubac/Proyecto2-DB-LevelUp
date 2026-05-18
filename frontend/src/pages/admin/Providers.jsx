@@ -3,7 +3,7 @@ import AdminLayout from '../../components/AdminLayout';
 import Pagination from '../../components/Pagination';
 import Modal from '../../components/Modal';
 import { getProviders, createProvider, updateProvider, deactivateProvider } from '../../api/providers.api';
-import { Loader2, Truck, Plus, Pencil, PowerOff, Search } from 'lucide-react';
+import { Loader2, Truck, Plus, Pencil, PowerOff } from 'lucide-react';
 import ConfirmModal from '../../components/ConfirmModal';
 import { useToast } from '../../context/ToastContext';
 

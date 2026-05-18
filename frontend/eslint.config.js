@@ -17,5 +17,16 @@ export default defineConfig([
       globals: globals.browser,
       parserOptions: { ecmaFeatures: { jsx: true } },
     },
+    rules: {
+      // async fetch functions inside effects are a valid pattern
+      'react-hooks/set-state-in-effect': 'off',
+    },
+  },
+  {
+    // context files export a context object + a hook/provider — that's intentional
+    files: ['**/context/**', '**/hooks/**'],
+    rules: {
+      'react-refresh/only-export-components': 'off',
+    },
   },
 ])

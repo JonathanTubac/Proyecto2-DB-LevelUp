@@ -2,7 +2,7 @@ import { useState, useEffect } from 'react';
 import AdminLayout from '../../components/AdminLayout';
 import Pagination from '../../components/Pagination';
 import { getUsers, deactivateUser } from '../../api/users.api';
-import { Loader2, Users as UsersIcon, PowerOff, Search } from 'lucide-react';
+import { Loader2, Users as UsersIcon, PowerOff } from 'lucide-react';
 import ConfirmModal from '../../components/ConfirmModal';
 import { useToast } from '../../context/ToastContext';
 
