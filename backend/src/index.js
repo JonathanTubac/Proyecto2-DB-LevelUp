@@ -2,7 +2,6 @@ import express from 'express'
 import 'dotenv/config'
 import { connect } from './config/db.js'
 import helmet from 'helmet';
-import cors from 'cors';
 
 //Middlewares imports
 import errorMiddleware from './middlewares/error.middleware.js'
@@ -26,6 +25,23 @@ import swaggerUi from 'swagger-ui-express'
 const app = express()
 const port = process.env.PORT || 3000
 
+const allowedOrigins = (process.env.FRONTEND_URL || 'http://localhost:5173')
+    .split(',')
+    .map(o => o.trim());
+
+// CORS manual — primer middleware, antes de helmet y cualquier otra cosa
+app.use((req, res, next) => {
+    const origin = req.headers.origin;
+    if (!origin || allowedOrigins.includes(origin)) {
+        res.setHeader('Access-Control-Allow-Origin', origin || '*');
+        res.setHeader('Access-Control-Allow-Methods', 'GET, POST, PUT, PATCH, DELETE, OPTIONS');
+        res.setHeader('Access-Control-Allow-Headers', 'Content-Type, Authorization');
+        res.setHeader('Access-Control-Allow-Credentials', 'true');
+    }
+    if (req.method === 'OPTIONS') return res.sendStatus(204);
+    next();
+});
+
 // SECURITY
 app.use(helmet({
     contentSecurityPolicy: {
@@ -35,19 +51,7 @@ app.use(helmet({
             'img-src': ["'self'", 'data:', 'https:'],
         },
     },
-}));
-const allowedOrigins = (process.env.FRONTEND_URL || 'http://localhost:5173')
-    .split(',')
-    .map(o => o.trim());
-
-app.use(cors({
-    origin: (origin, cb) => {
-        if (!origin || allowedOrigins.includes(origin)) return cb(null, true);
-        cb(new Error(`CORS: origin ${origin} not allowed`));
-    },
-    methods: ['GET', 'POST', 'PUT', 'PATCH', 'DELETE'],
-    allowedHeaders: ['Content-Type', 'Authorization'],
-    credentials: true,
+    crossOriginResourcePolicy: false,
 }));
 
 //BODYPARSER
@@ -94,10 +98,12 @@ app.use((req, res) => {
 //ERROR MIDDLEWARE
 app.use(errorMiddleware)
 
-//DB CONNECTION
-await connect()
+//DB CONNECTION + SERVER (solo local y Docker)
+if (process.env.VERCEL !== '1') {
+    await connect();
+    app.listen(port, () => console.log(`🚀 Server running on port: ${port}`));
+} else {
+    connect().catch(err => console.error('DB error:', err.message));
+}
 
-//SERVER START
-app.listen(port, () => {
-    console.log(`🚀 Server running on port: ${port}`)
-})
+export default app;
