@@ -243,47 +243,47 @@ SELECT
   (SELECT COALESCE(SUM(monto), 0) FROM billeteras)
     AS saldo_total;
 
--- ─── ROLES DE BASE DE DATOS (Proyecto 3) ─────────────────────────────────────
--- 5 roles con permisos granulares por tabla y operación
+-- ─── ROLES OF DB ─────────────────────────────────────
+-- 5 roles with access by table and operation
 
-CREATE ROLE rol_admin     NOLOGIN;
-CREATE ROLE rol_gerente   NOLOGIN;
-CREATE ROLE rol_empleado  NOLOGIN;
+CREATE ROLE rol_admin NOLOGIN;
+CREATE ROLE rol_gerente NOLOGIN;
+CREATE ROLE rol_empleado NOLOGIN;
 CREATE ROLE rol_bodeguero NOLOGIN;
-CREATE ROLE rol_cliente   NOLOGIN;
+CREATE ROLE rol_cliente NOLOGIN;
 
--- rol_admin: acceso total a todas las tablas y secuencias
-GRANT ALL PRIVILEGES ON ALL TABLES IN SCHEMA public    TO rol_admin;
+-- rol_admin: total access to all tables and sequences
+GRANT ALL PRIVILEGES ON ALL TABLES IN SCHEMA public TO rol_admin;
 GRANT ALL PRIVILEGES ON ALL SEQUENCES IN SCHEMA public TO rol_admin;
 
--- rol_gerente: supervisión de ventas y gestión de personal; no puede borrar registros financieros
-GRANT SELECT ON ALL TABLES IN SCHEMA public            TO rol_gerente;
-GRANT ALL PRIVILEGES ON usuarios, empleados, roles     TO rol_gerente;
-GRANT INSERT, UPDATE ON compras, detallecompras        TO rol_gerente;
-GRANT USAGE, SELECT ON ALL SEQUENCES IN SCHEMA public  TO rol_gerente;
-REVOKE DELETE ON compras, detallecompras, movimientos  FROM rol_gerente;
+-- rol_gerente: sales supervision and personnel management; he can't delete finance registers
+GRANT SELECT ON ALL TABLES IN SCHEMA public TO rol_gerente;
+GRANT ALL PRIVILEGES ON usuarios, empleados, roles TO rol_gerente;
+GRANT INSERT, UPDATE ON compras, detallecompras TO rol_gerente;
+GRANT USAGE, SELECT ON ALL SEQUENCES IN SCHEMA public TO rol_gerente;
+REVOKE DELETE ON compras, detallecompras, movimientos FROM rol_gerente;
 
--- rol_empleado: procesar ventas, consultar inventario y gestionar billeteras de clientes
+-- rol_empleado: process sales, check inventory, and manage customer wallets
 GRANT SELECT ON productos, categorias, proveedores,
                compras, detallecompras, empleados,
-               billeteras, usuarios                    TO rol_empleado;
+               billeteras, usuarios TO rol_empleado;
 GRANT ALL PRIVILEGES ON compras, detallecompras,
-                        movimientos, billeteras        TO rol_empleado;
-GRANT USAGE, SELECT ON ALL SEQUENCES IN SCHEMA public  TO rol_empleado;
+                        movimientos, billeteras TO rol_empleado;
+GRANT USAGE, SELECT ON ALL SEQUENCES IN SCHEMA public TO rol_empleado;
 REVOKE DELETE ON compras, detallecompras,
-                movimientos, billeteras                FROM rol_empleado;
+                movimientos, billeteras FROM rol_empleado;
 
--- rol_bodeguero: gestión de inventario y proveedores; sin acceso a datos de ventas ni usuarios
-GRANT SELECT ON ALL TABLES IN SCHEMA public            TO rol_bodeguero;
+-- rol_bodeguero: Inventory and supplier management; no access to sales or user data
+GRANT SELECT ON ALL TABLES IN SCHEMA public TO rol_bodeguero;
 GRANT ALL PRIVILEGES ON productos, proveedores, brinda TO rol_bodeguero;
-GRANT USAGE, SELECT ON ALL SEQUENCES IN SCHEMA public  TO rol_bodeguero;
-REVOKE DELETE ON productos, proveedores                FROM rol_bodeguero;
+GRANT USAGE, SELECT ON ALL SEQUENCES IN SCHEMA public TO rol_bodeguero;
+REVOKE DELETE ON productos, proveedores FROM rol_bodeguero;
 
--- rol_cliente: navegar catálogo, registrar compras y gestionar su propia billetera
-GRANT SELECT ON productos, categorias                  TO rol_cliente;
+-- rol_cliente: Browse the catalog, register purchases, and manage your own wallet.
+GRANT SELECT ON productos, categorias TO rol_cliente;
 GRANT ALL PRIVILEGES ON compras, detallecompras,
-                        billeteras, movimientos        TO rol_cliente;
-GRANT USAGE, SELECT ON ALL SEQUENCES IN SCHEMA public  TO rol_cliente;
+                        billeteras, movimientos TO rol_cliente;
+GRANT USAGE, SELECT ON ALL SEQUENCES IN SCHEMA public TO rol_cliente;
 REVOKE DELETE ON compras, detallecompras,
-                billeteras, movimientos                FROM rol_cliente;
-REVOKE UPDATE ON movimientos                           FROM rol_cliente;
+                billeteras, movimientos FROM rol_cliente;
+REVOKE UPDATE ON movimientos FROM rol_cliente;
