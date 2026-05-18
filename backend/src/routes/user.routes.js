@@ -219,6 +219,8 @@ router.put('/:id', protect, authorize('Administrador'), ctrl.update)
  *             schema:
  *               $ref: '#/components/schemas/Error'
  */
-router.delete('/:id', protect, authorize('Administrador'), ctrl.remove)
+router.delete('/:id', protect, authorize('Administrador'), ctrl.remove);
+
+router.patch('/:id/activate', protect, authorize('Administrador', 'Gerente'), ctrl.activate);
 
 export default router;

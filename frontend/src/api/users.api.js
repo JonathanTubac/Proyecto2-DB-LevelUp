@@ -19,7 +19,9 @@ export const updateUser = async (id, data) => {
 };
 
 export const deactivateUser = async (id) => {
-  return await fetchWithAuth(`/users/${id}`, {
-    method: 'DELETE',
-  });
-};  
+  return await fetchWithAuth(`/users/${id}`, { method: 'DELETE' });
+};
+
+export const activateUser = async (id) => {
+  return await fetchWithAuth(`/users/${id}/activate`, { method: 'PATCH' });
+};

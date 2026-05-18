@@ -1,8 +1,8 @@
 import { useState, useEffect } from 'react';
 import AdminLayout from '../../components/AdminLayout';
 import Pagination from '../../components/Pagination';
-import { getUsers, deactivateUser } from '../../api/users.api';
-import { Loader2, Users as UsersIcon, PowerOff } from 'lucide-react';
+import { getUsers, deactivateUser, activateUser } from '../../api/users.api';
+import { Loader2, Users as UsersIcon, PowerOff, Power } from 'lucide-react';
 import ConfirmModal from '../../components/ConfirmModal';
 import { useToast } from '../../context/ToastContext';
 
@@ -50,11 +50,30 @@ export default function Users() {
 
     const handleDeactivate = (id) => {
         setConfirm({
+            message: '¿Seguro que deseas desactivar este usuario? No podrá iniciar sesión.',
+            confirmLabel: 'Desactivar',
             onConfirm: async () => {
                 setConfirm(null);
                 try {
                     await deactivateUser(id);
                     showToast('Usuario desactivado');
+                    refetch();
+                } catch (err) {
+                    showToast(err.message, 'error');
+                }
+            },
+        });
+    };
+
+    const handleActivate = (id) => {
+        setConfirm({
+            message: '¿Seguro que deseas reactivar este usuario?',
+            confirmLabel: 'Reactivar',
+            onConfirm: async () => {
+                setConfirm(null);
+                try {
+                    await activateUser(id);
+                    showToast('Usuario reactivado');
                     refetch();
                 } catch (err) {
                     showToast(err.message, 'error');
@@ -83,7 +102,9 @@ export default function Users() {
                         >
                             <option value="">Todos los roles</option>
                             <option value="Administrador">Administrador</option>
+                            <option value="Gerente">Gerente</option>
                             <option value="Empleado">Empleado</option>
+                            <option value="Bodeguero">Bodeguero</option>
                             <option value="Cliente">Cliente</option>
                         </select>
                     </div>
@@ -130,9 +151,13 @@ export default function Users() {
                                             </span>
                                         </td>
                                         <td>
-                                            {user.activo && (
+                                            {user.activo ? (
                                                 <button className="btn-danger" style={{ display: 'flex', alignItems: 'center', gap: '0.3rem' }} onClick={() => handleDeactivate(user.id)}>
                                                     <PowerOff size={13} /> Desactivar
+                                                </button>
+                                            ) : (
+                                                <button className="btn-secondary" style={{ display: 'flex', alignItems: 'center', gap: '0.3rem' }} onClick={() => handleActivate(user.id)}>
+                                                    <Power size={13} /> Reactivar
                                                 </button>
                                             )}
                                         </td>
@@ -146,9 +171,9 @@ export default function Users() {
             </div>
             {confirm && (
                 <ConfirmModal
-                    title="Desactivar usuario"
-                    message="¿Seguro que deseas desactivar este usuario? No podrá iniciar sesión."
-                    confirmLabel="Desactivar"
+                    title="Confirmar acción"
+                    message={confirm.message}
+                    confirmLabel={confirm.confirmLabel}
                     onConfirm={confirm.onConfirm}
                     onClose={() => setConfirm(null)}
                 />

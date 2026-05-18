@@ -64,9 +64,9 @@ export const updateById = async (id, { name, email, phone, role_id }) => {
 }
 
 export const deleteById = async (id) => {
-    await pool.query(`
-        UPDATE usuarios
-        SET activo = false
-        WHERE id = $1
-    `, [id])
-}
+    await pool.query(`UPDATE usuarios SET activo = false WHERE id = $1`, [id]);
+};
+
+export const activateById = async (id) => {
+    await pool.query(`UPDATE usuarios SET activo = true WHERE id = $1`, [id]);
+};
