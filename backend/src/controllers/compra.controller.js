@@ -45,14 +45,9 @@ export const createPresencial = async (req, res, next) => {
         if (!id_empleado)
             return next(new ForbiddenError('Solo empleados con carnet registrado pueden procesar ventas presenciales'));
 
-        const { id_usuario_cliente, productos } = req.body;
+        const { productos } = req.body;
 
-        const result = await compraService.createCompra(id_usuario_cliente, {
-            tipo: 'presencial',
-            productos,
-            id_empleado,
-        });
-
+        const result = await compraService.createPresencialCompra(req.user.id, id_empleado, productos);
         res.status(201).json({ success: true, data: result });
     } catch (err) {
         next(err);

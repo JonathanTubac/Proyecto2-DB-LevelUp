@@ -63,7 +63,7 @@ CREATE TABLE Compras(
 	tipo VARCHAR(60) CHECK (tipo IN ('presencial', 'en_linea')),
 	fecha TIMESTAMP DEFAULT CURRENT_TIMESTAMP NOT NULL,
 	total DECIMAL(10,2) CHECK (total >= 0),
-	id_usuario INT NOT NULL, -- FK de Usuarios
+	id_usuario INT, -- FK de Usuarios
 	id_empleado INT -- FK de Empleados (nullable para compras en línea)
 );
 

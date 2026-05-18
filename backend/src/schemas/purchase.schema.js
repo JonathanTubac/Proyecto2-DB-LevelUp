@@ -13,7 +13,6 @@ export const purchaseSchema = z.object({
 });
 
 export const presencialPurchaseSchema = z.object({
-  id_usuario_cliente: z.number().int().positive('ID de cliente inválido'),
   productos: z.array(
     z.object({
       id_producto: z.number().int().positive('ID de producto inválido'),
