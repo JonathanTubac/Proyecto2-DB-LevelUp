@@ -106,11 +106,12 @@ export const createCompra = async (userId, { tipo, productos, id_empleado }) => 
     });
 };
 
-export const getCompraById = async (id, userId) => {
+export const getCompraById = async (id, userId, rol) => {
     const compra = await compraRepo.findById(id);
     if (!compra) throw new NotFoundError('purchase not found!');
 
-    if (compra.id_usuario !== userId)
+    // Los clientes solo pueden ver sus propias compras
+    if (rol === 'Cliente' && compra.id_usuario !== userId)
         throw new NotFoundError('purchase not found!');
 
     return compra;

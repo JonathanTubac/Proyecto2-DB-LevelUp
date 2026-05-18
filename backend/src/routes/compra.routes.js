@@ -2,7 +2,7 @@ import * as ctrl from '../controllers/compra.controller.js'
 import { Router } from 'express'
 import { authorize, protect } from '../middlewares/auth.middleware.js';
 import { validate } from '../middlewares/validate.middleware.js';
-import { purchaseSchema } from '../schemas/purchase.schema.js';
+import { purchaseSchema, presencialPurchaseSchema } from '../schemas/purchase.schema.js';
 
 const router = Router();
 
@@ -61,7 +61,9 @@ router.get('/report', protect, ctrl.getMyReport);
  *             schema:
  *               $ref: '#/components/schemas/Error'
  */
-router.get('/' ,protect, authorize('Administrador') , ctrl.getAll);
+router.get('/', protect, authorize('Administrador', 'Gerente', 'Empleado'), ctrl.getAll);
+
+router.post('/presencial', protect, authorize('Empleado', 'Administrador', 'Gerente'), validate(presencialPurchaseSchema), ctrl.createPresencial);
 
 /**
  * @swagger
