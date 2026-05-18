@@ -351,8 +351,6 @@ Password!1
 | Role | Email | Password |
 |---|---|---|
 | Admin | admin@levelup.com | Password!1 |
-| Employee | carlos@levelup.com | Password!1 |
-| Employee | maria@levelup.com | Password!1 |
 | Client | juan@gmail.com | Password!1 |
 | Client | ana@gmail.com | Password!1 |
 | Client | pedro@gmail.com | Password!1 |
