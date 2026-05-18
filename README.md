@@ -195,7 +195,7 @@ NODE_ENV=production
 DB_HOST=postgres
 DB_PORT=5432
 DB_NAME=levelup
-DB_USER=proy2
+DB_USER=proy3
 DB_PASSWORD=your_db_password
 
 # JWT — use long, random strings in production
