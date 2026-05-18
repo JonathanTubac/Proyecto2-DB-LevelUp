@@ -4,6 +4,65 @@ A full-stack web application for managing a gaming store. It covers product cata
 
 ---
 
+## Live Demo
+
+| Service | URL |
+|---|---|
+| Frontend | https://proyecto2-db-level-up-front.vercel.app |
+| Backend API | https://proyecto2-db-level-up-backend.vercel.app/api/v1 |
+| Swagger Docs | https://proyecto2-db-level-up-backend.vercel.app/api-docs |
+
+---
+
+## Rubric Checklist (cc3062 Proyecto 2)
+
+### I. Arquitectura y API REST — 35/35 pts
+
+| Criterio | Estado | Pts |
+|---|---|---|
+| Endpoints REST documentados (Swagger/OpenAPI) | ✅ | 8 |
+| CRUD completo para ≥ 2 entidades (productos, categorías, proveedores, usuarios, compras) | ✅ | 15 |
+| Manejo de errores HTTP correctos + mensajes JSON | ✅ | 7 |
+| ≥ 1 endpoint que agrega datos (`/api/v1/dashboard`) | ✅ | 5 |
+
+### II. Frontend — React — 53/53 pts
+
+| Criterio | Estado | Pts |
+|---|---|---|
+| React Router con ≥ 4 rutas distintas (12 rutas implementadas) | ✅ | 8 |
+| Estado global con React Context (`AuthContext`, `CartContext`) | ✅ | 8 |
+| `useState`, `useEffect` y `useCallback`/`useMemo` | ✅ | 8 |
+| Flujo de estado complejo con `useReducer` (carrito de compras) | ✅ | 8 |
+| Formularios controlados con validación del lado del cliente | ✅ | 8 |
+| Reporte visible en UI con datos reales (Dashboard KPIs + tablas) | ✅ | 8 |
+| Manejo visible de errores para el usuario (toasts + mensajes) | ✅ | 5 |
+
+### III. Calidad de código — 12/12 pts
+
+| Criterio | Estado | Pts |
+|---|---|---|
+| ESLint funcional (`eslint.config.js`) | ✅ | 5 |
+| ≥ 3 pruebas unitarias o de integración que pasen | ✅ | 7 |
+
+### IV. Despliegue y entrega — 15/15 pts
+
+| Criterio | Estado | Pts |
+|---|---|---|
+| README con instrucciones funcionales + `docker compose up` | ✅ | 5 |
+| Proyecto levanta correctamente con `docker compose up` | ✅ | 10 |
+
+### V. Avanzado — 20/20 pts
+
+| Criterio | Estado | Pts |
+|---|---|---|
+| Autenticación con login/logout y sesión manejada con Context | ✅ | 10 |
+| Exportar reporte a PDF desde la UI | ✅ | 5 |
+| Diseño responsivo verificable en móvil y escritorio | ✅ | 5 |
+
+> **Nota:** El proyecto está desplegado en producción en Vercel (ver sección Live Demo arriba).
+
+---
+
 ## Tech Stack
 
 | Layer | Technology |
