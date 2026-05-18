@@ -2,9 +2,9 @@ import { useState, useEffect } from 'react';
 import AdminLayout from '../../components/AdminLayout';
 import Pagination from '../../components/Pagination';
 import Modal from '../../components/Modal';
-import { getProducts, createProduct, updateProduct, deactivateProduct } from '../../api/products.api';
+import { getProducts, createProduct, updateProduct, deactivateProduct, activateProduct } from '../../api/products.api';
 import { getCategories } from '../../api/categories.api';
-import { Loader2, Gamepad2, Plus, Pencil, PowerOff } from 'lucide-react';
+import { Loader2, Gamepad2, Plus, Pencil, PowerOff, Power } from 'lucide-react';
 import ConfirmModal from '../../components/ConfirmModal';
 import { useToast } from '../../context/ToastContext';
 
@@ -40,7 +40,7 @@ export default function Products() {
             setLoading(true);
             setError('');
             try {
-                const res = await getProducts({ page, limit: 10, nombre: search || undefined });
+                const res = await getProducts({ page, limit: 10, nombre: search || undefined, showAll: true });
                 setProducts(res.data);
                 setPagination(res.pagination);
             } catch (err) {
@@ -112,11 +112,29 @@ export default function Products() {
     const handleDeactivate = (id) => {
         setConfirm({
             message: '¿Seguro que deseas desactivar este producto? Ya no será visible en la tienda.',
+            confirmLabel: 'Desactivar',
             onConfirm: async () => {
                 setConfirm(null);
                 try {
                     await deactivateProduct(id);
                     showToast('Producto desactivado');
+                    refetch();
+                } catch (err) {
+                    showToast(err.message, 'error');
+                }
+            },
+        });
+    };
+
+    const handleActivate = (id) => {
+        setConfirm({
+            message: '¿Seguro que deseas reactivar este producto?',
+            confirmLabel: 'Reactivar',
+            onConfirm: async () => {
+                setConfirm(null);
+                try {
+                    await activateProduct(id);
+                    showToast('Producto reactivado');
                     refetch();
                 } catch (err) {
                     showToast(err.message, 'error');
@@ -188,9 +206,13 @@ export default function Products() {
                                             >
                                                 <Pencil size={13} /> Editar
                                             </button>
-                                            {p.activo && (
+                                            {p.activo ? (
                                                 <button className="btn-danger" style={{ display: 'flex', alignItems: 'center', gap: '0.3rem' }} onClick={() => handleDeactivate(p.id)}>
                                                     <PowerOff size={13} /> Desactivar
+                                                </button>
+                                            ) : (
+                                                <button className="btn-secondary" style={{ display: 'flex', alignItems: 'center', gap: '0.3rem' }} onClick={() => handleActivate(p.id)}>
+                                                    <Power size={13} /> Reactivar
                                                 </button>
                                             )}
                                         </td>
@@ -205,9 +227,9 @@ export default function Products() {
 
             {confirm && (
                 <ConfirmModal
-                    title="Desactivar producto"
+                    title="Confirmar acción"
                     message={confirm.message}
-                    confirmLabel="Desactivar"
+                    confirmLabel={confirm.confirmLabel}
                     onConfirm={confirm.onConfirm}
                     onClose={() => setConfirm(null)}
                 />

@@ -1,16 +1,16 @@
 import { pool } from "../config/db.js";
 
-export const findAll = async ({ limit, offset, nombre }) => {
+export const findAll = async ({ limit, offset, nombre, showAll = false }) => {
     const { rows } = await pool.query(`
     SELECT
       id, nombre, activo,
       COUNT(*) OVER() AS total
     FROM proveedores
-    WHERE activo = true
+    WHERE ($4::boolean = true OR activo = true)
       AND ($1::text IS NULL OR nombre ILIKE '%' || $1 || '%')
     ORDER BY nombre
     LIMIT $2 OFFSET $3
-  `, [nombre ?? null, limit, offset]);
+  `, [nombre ?? null, limit, offset, showAll]);
 
     return {
         data: rows.map(({ total, ...p }) => p),
@@ -50,9 +50,9 @@ export const update = async (id, { name }) => {
 };
 
 export const deactivate = async (id) => {
-    await pool.query(`
-        UPDATE proveedores
-        SET activo = false
-        WHERE id = $1        
-    `, [id]);
-}
+    await pool.query(`UPDATE proveedores SET activo = false WHERE id = $1`, [id]);
+};
+
+export const activate = async (id) => {
+    await pool.query(`UPDATE proveedores SET activo = true WHERE id = $1`, [id]);
+};

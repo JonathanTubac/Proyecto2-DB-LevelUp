@@ -48,10 +48,18 @@ export const update = async (req, res, next) => {
 
 export const deactivate = async (req, res, next) => {
     try {
-        const { id } = req.params;
-        await productService.deactivateProduct(id);
-        res.status(200).json({ success: true })
+        await productService.deactivateProduct(req.params.id);
+        res.json({ success: true });
     } catch (err) {
         next(err);
     }
-}
+};
+
+export const activate = async (req, res, next) => {
+    try {
+        await productService.activateProduct(req.params.id);
+        res.json({ success: true });
+    } catch (err) {
+        next(err);
+    }
+};

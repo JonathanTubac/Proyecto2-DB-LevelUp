@@ -5,9 +5,9 @@ import { getPagination } from '../utils/pagination.js';
 
 export const getProducts = async (query) => {
     const { page, limit, offset } = getPagination(query);
-    const { category, name } = query;
-    
-    return await productRepo.findAll({ limit, offset, category, name });
+    const { category, name, showAll } = query;
+
+    return await productRepo.findAll({ limit, offset, category, name, showAll: showAll === 'true' });
 };
 
 export const getProductById = async (id) => {
@@ -38,6 +38,11 @@ export const updateProduct = async (id, { name, price, stock, id_category }) => 
 export const deactivateProduct = async (id) => {
     const product = await productRepo.findById(id);
     if (!product) throw new NotFoundError('Product not found!');
-
     return await productRepo.deactivate(id);
+};
+
+export const activateProduct = async (id) => {
+    const product = await productRepo.findById(id);
+    if (!product) throw new NotFoundError('Product not found!');
+    return await productRepo.activate(id);
 };

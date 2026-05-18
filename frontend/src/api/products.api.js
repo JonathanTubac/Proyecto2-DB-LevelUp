@@ -1,10 +1,11 @@
 import { fetchWithAuth } from './fetchWithAuth';
 
 // src/api/products.api.js
-export const getProducts = async ({ page = 1, limit = 10, nombre, categoria } = {}) => {
+export const getProducts = async ({ page = 1, limit = 10, nombre, categoria, showAll = false } = {}) => {
     const params = new URLSearchParams({ page, limit });
-    if (nombre) params.append('name', nombre); 
+    if (nombre) params.append('name', nombre);
     if (categoria) params.append('category', categoria);
+    if (showAll) params.append('showAll', 'true');
     return await fetchWithAuth(`/products?${params}`);
 };
 export const createProduct = async (data) => {
@@ -22,7 +23,9 @@ export const updateProduct = async (id, data) => {
 };
 
 export const deactivateProduct = async (id) => {
-    return await fetchWithAuth(`/products/${id}`, {
-        method: 'DELETE',
-    });
+    return await fetchWithAuth(`/products/${id}`, { method: 'DELETE' });
+};
+
+export const activateProduct = async (id) => {
+    return await fetchWithAuth(`/products/${id}/activate`, { method: 'PATCH' });
 };
