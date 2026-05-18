@@ -3,19 +3,21 @@ import { useAuth } from '../hooks/useAuth';
 import { logoutRequest } from '../api/auth.api';
 import { LayoutDashboard, Users, Gamepad2, FolderOpen, Truck, ShoppingCart, Wallet, LogOut } from 'lucide-react';
 
-const navItems = [
-    { to: '/admin', icon: <LayoutDashboard size={18} />, label: 'Dashboard' },
-    { to: '/admin/users', icon: <Users size={18} />, label: 'Usuarios' },
-    { to: '/admin/products', icon: <Gamepad2 size={18} />, label: 'Productos' },
-    { to: '/admin/categories', icon: <FolderOpen size={18} />, label: 'Categorías' },
-    { to: '/admin/providers', icon: <Truck size={18} />, label: 'Proveedores' },
-    { to: '/admin/purchases', icon: <ShoppingCart size={18} />, label: 'Compras' },
-    { to: '/admin/wallets', icon: <Wallet size={18} />, label: 'Billeteras' },
+const allNavItems = [
+    { to: '/admin',            icon: <LayoutDashboard size={18} />, label: 'Dashboard',   roles: ['Administrador', 'Gerente'] },
+    { to: '/admin/users',      icon: <Users size={18} />,           label: 'Usuarios',    roles: ['Administrador', 'Gerente'] },
+    { to: '/admin/products',   icon: <Gamepad2 size={18} />,        label: 'Productos',   roles: ['Administrador', 'Gerente', 'Empleado', 'Bodeguero'] },
+    { to: '/admin/categories', icon: <FolderOpen size={18} />,      label: 'Categorías',  roles: ['Administrador', 'Gerente', 'Bodeguero'] },
+    { to: '/admin/providers',  icon: <Truck size={18} />,           label: 'Proveedores', roles: ['Administrador', 'Gerente', 'Bodeguero'] },
+    { to: '/admin/purchases',  icon: <ShoppingCart size={18} />,    label: 'Compras',     roles: ['Administrador', 'Gerente', 'Empleado'] },
+    { to: '/admin/wallets',    icon: <Wallet size={18} />,          label: 'Billeteras',  roles: ['Administrador', 'Gerente'] },
 ];
 
 export default function Sidebar() {
     const { user, logout } = useAuth();
     const navigate = useNavigate();
+
+    const navItems = allNavItems.filter(item => item.roles.includes(user?.rol));
 
     const handleLogout = async () => {
         const refreshToken = localStorage.getItem('refreshToken');
