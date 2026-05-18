@@ -32,7 +32,11 @@ const allowedOrigins = (process.env.FRONTEND_URL || 'http://localhost:5173')
 // CORS manual — primer middleware, antes de helmet y cualquier otra cosa
 app.use((req, res, next) => {
     const origin = req.headers.origin;
-    if (!origin || allowedOrigins.includes(origin)) {
+    const isAllowed = !origin
+        || allowedOrigins.includes(origin)
+        || (process.env.NODE_ENV === 'production' && origin.endsWith('.vercel.app'));
+
+    if (isAllowed) {
         res.setHeader('Access-Control-Allow-Origin', origin || '*');
         res.setHeader('Access-Control-Allow-Methods', 'GET, POST, PUT, PATCH, DELETE, OPTIONS');
         res.setHeader('Access-Control-Allow-Headers', 'Content-Type, Authorization');
