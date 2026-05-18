@@ -2,7 +2,7 @@ import { fetchWithAuth } from './fetchWithAuth';
 
 export const getProductsClient = async ({ page = 1, limit = 12, nombre, categoria } = {}) => {
   const params = new URLSearchParams({ page, limit });
-  if (nombre)    params.append('nombre', nombre);
+  if (nombre)    params.append('name', nombre);
   if (categoria) params.append('categoria', categoria);
   return await fetchWithAuth(`/products?${params}`);
 };
