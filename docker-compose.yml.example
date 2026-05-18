@@ -33,6 +33,8 @@ services:
       - .env
     environment:
       DB_HOST: postgres
+      DATABASE_URL: ""
+      NODE_ENV: development
     depends_on:
       postgres:
         condition: service_healthy
