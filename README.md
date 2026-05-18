@@ -342,7 +342,7 @@ The frontend will be available at `http://localhost:5173`.
 
 ## Test Credentials
 
-The seed script (`insercion.sql`) creates the following users. Password for all of them:
+The seed script (`insercion.sql`) creates one functional user per database role. Password for all accounts:
 
 ```
 Password!1
@@ -350,10 +350,11 @@ Password!1
 
 | Role | Email | Password |
 |---|---|---|
-| Admin | admin@levelup.com | Password!1 |
-| Client | juan@gmail.com | Password!1 |
-| Client | ana@gmail.com | Password!1 |
-| Client | pedro@gmail.com | Password!1 |
+| Administrador | admin@levelup.com | Password!1 |
+| Empleado | carlos@levelup.com | Password!1 |
+| Cliente | juan@gmail.com | Password!1 |
+| Gerente | gerente@levelup.com | Password!1 |
+| Bodeguero | bodeguero@levelup.com | Password!1 |
 
 Wallets are created automatically for every user via a database trigger (`tgr_create_wallet_user`).
 
@@ -396,6 +397,22 @@ Interactive Swagger documentation is available at `http://localhost:3000/api-doc
 | `refresh_tokens` | JWT refresh token store |
 
 A `dashboard_metrics` view aggregates KPIs for the admin dashboard.
+
+---
+
+## Database Roles (Proyecto 3)
+
+Five roles are defined at the PostgreSQL level using `CREATE ROLE` with granular permissions assigned via `GRANT` and `REVOKE`. These roles map to the five business user types of the store.
+
+| DBMS Role | App Role | Accessible Tables | Permitted Operations |
+|---|---|---|---|
+| `rol_admin` | Administrador | All tables and sequences | ALL (SELECT, INSERT, UPDATE, DELETE, TRUNCATE) |
+| `rol_gerente` | Gerente | All tables (SELECT); `usuarios`, `empleados`, `roles` (write) | SELECT all · INSERT/UPDATE on `compras`, `detallecompras` · ALL on `usuarios`, `empleados`, `roles` · **REVOKE DELETE** on `compras`, `detallecompras`, `movimientos` |
+| `rol_empleado` | Empleado | `productos`, `categorias`, `proveedores`, `compras`, `detallecompras`, `empleados`, `billeteras`, `usuarios` | SELECT all listed · ALL on `compras`, `detallecompras`, `movimientos`, `billeteras` · **REVOKE DELETE** on financial tables |
+| `rol_bodeguero` | Bodeguero | All tables (SELECT); `productos`, `proveedores`, `brinda` (write) | SELECT all · ALL on `productos`, `proveedores`, `brinda` · **REVOKE DELETE** on `productos`, `proveedores` |
+| `rol_cliente` | Cliente | `productos`, `categorias` (read); `compras`, `detallecompras`, `billeteras`, `movimientos` (own data) | SELECT on catalog · ALL on `compras`, `detallecompras`, `billeteras`, `movimientos` · **REVOKE DELETE** and **REVOKE UPDATE** on `movimientos` |
+
+> Roles are defined in `backend/src/db/init/DDL.sql` and are created automatically when the database container initializes.
 
 ---
 
