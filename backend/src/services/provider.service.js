@@ -4,9 +4,9 @@ import { getPagination } from '../utils/pagination.js';
 
 export const getProviders = async (query) => {
     const { page, limit, offset } = getPagination(query);
-    const { nombre } = query;
+    const { nombre, showAll } = query;
 
-    return await providerRepo.findAll({ limit, offset, nombre });
+    return await providerRepo.findAll({ limit, offset, nombre, showAll: showAll === 'true' });
 }
 
 export const getProvider = async (id) => {
@@ -33,7 +33,11 @@ export const updateProvider = async (id, { name }) => {
 export const deactivateProvider = async (id) => {
     const provider = await providerRepo.findById(id);
     if (!provider) throw new NotFoundError('This provider doesnt exists!');
-
     return await providerRepo.deactivate(id);
+};
 
-}
+export const activateProvider = async (id) => {
+    const provider = await providerRepo.findById(id);
+    if (!provider) throw new NotFoundError('This provider doesnt exists!');
+    return await providerRepo.activate(id);
+};

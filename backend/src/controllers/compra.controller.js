@@ -1,5 +1,6 @@
 import * as compraService from '../services/compra.service.js'
 import { getPagination, paginatedResponse } from '../utils/pagination.js';
+import { ForbiddenError } from '../utils/errors.js';
 
 export const getAll = async (req, res, next) => {
     try {
@@ -31,9 +32,23 @@ export const create = async (req, res, next) => {
 export const getById = async (req, res, next) => {
     try {
         const { id } = req.params;
-        const { id: userId } = req.user;
-        const compra = await compraService.getCompraById(id, userId);
+        const compra = await compraService.getCompraById(id, req.user.id, req.user.rol);
         res.status(200).json({ success: true, data: compra });
+    } catch (err) {
+        next(err);
+    }
+};
+
+export const createPresencial = async (req, res, next) => {
+    try {
+        const id_empleado = req.user.carnet;
+        if (!id_empleado)
+            return next(new ForbiddenError('Solo empleados con carnet registrado pueden procesar ventas presenciales'));
+
+        const { productos } = req.body;
+
+        const result = await compraService.createPresencialCompra(req.user.id, id_empleado, productos);
+        res.status(201).json({ success: true, data: result });
     } catch (err) {
         next(err);
     }

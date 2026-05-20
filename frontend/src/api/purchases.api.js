@@ -9,3 +9,10 @@ export const getPurchases = async ({ page = 1, limit = 10, tipo } = {}) => {
 export const getPurchaseById = async (id) => {
   return await fetchWithAuth(`/purchases/${id}`);
 };
+
+export const createPresencialSale = async ({ productos }) => {
+  return await fetchWithAuth('/purchases/presencial', {
+    method: 'POST',
+    body: JSON.stringify({ productos }),
+  });
+};

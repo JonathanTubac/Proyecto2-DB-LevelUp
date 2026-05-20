@@ -11,3 +11,12 @@ export const purchaseSchema = z.object({
     })
   ).min(1, 'Debes enviar al menos un producto'),
 });
+
+export const presencialPurchaseSchema = z.object({
+  productos: z.array(
+    z.object({
+      id_producto: z.number().int().positive('ID de producto inválido'),
+      cantidad:    z.number().int().positive('La cantidad debe ser mayor a 0'),
+    })
+  ).min(1, 'Debes enviar al menos un producto'),
+});

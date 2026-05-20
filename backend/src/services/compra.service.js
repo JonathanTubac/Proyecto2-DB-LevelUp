@@ -106,11 +106,12 @@ export const createCompra = async (userId, { tipo, productos, id_empleado }) => 
     });
 };
 
-export const getCompraById = async (id, userId) => {
+export const getCompraById = async (id, userId, rol) => {
     const compra = await compraRepo.findById(id);
     if (!compra) throw new NotFoundError('purchase not found!');
 
-    if (compra.id_usuario !== userId)
+    // Los clientes solo pueden ver sus propias compras
+    if (rol === 'Cliente' && compra.id_usuario !== userId)
         throw new NotFoundError('purchase not found!');
 
     return compra;
@@ -124,4 +125,56 @@ export const getMyCompras = async (userId, query) => {
 
 export const getMyReport = async (userId, filters) => {
   return await compraRepo.getReportByUserId(userId, filters);
+};
+
+export const createPresencialCompra = async (userId, id_empleado, productos) => {
+    if (!productos?.length)
+        throw new ValidationError('You must send at least one product!');
+
+    const productosConPrecio = [];
+
+    for (const item of productos) {
+        const product = await productRepo.findById(item.id_producto);
+        if (!product) throw new NotFoundError(`Product ${item.id_producto} not found!`);
+        if (product.stock < item.cantidad)
+            throw new ValidationError(`Insufficient stock for ${product.nombre}. Available: ${product.stock}`);
+
+        productosConPrecio.push({
+            id_producto:      product.id,
+            nombre:           product.nombre,
+            cantidad_producto: item.cantidad,
+            precio_unitario:  product.precio,
+        });
+    }
+
+    const total = productosConPrecio.reduce(
+        (acc, i) => acc + i.precio_unitario * i.cantidad_producto, 0
+    );
+
+    return await withTransaction(async (client) => {
+        const compra = await compraRepo.create(client, {
+            tipo:        'presencial',
+            total,
+            id_usuario:  userId,
+            id_empleado,
+        });
+
+        for (const item of productosConPrecio) {
+            await compraRepo.createDetalle(client, {
+                id_compra:         compra.id,
+                id_producto:       item.id_producto,
+                cantidad_producto: item.cantidad_producto,
+                precio_unitario:   item.precio_unitario,
+            });
+
+            const stockUpdated = await productRepo.decreaseStock(client, item.id_producto, item.cantidad_producto);
+            if (!stockUpdated)
+                throw new ValidationError(`Insufficient stock for ${item.nombre}!`);
+        }
+
+        return {
+            compra:  { id: compra.id, tipo: compra.tipo, fecha: compra.fecha, total: compra.total },
+            detalle: productosConPrecio,
+        };
+    });
 };

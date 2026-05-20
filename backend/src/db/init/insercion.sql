@@ -5,7 +5,9 @@ INSERT INTO
 VALUES
   ('Administrador'),
   ('Empleado'),
-  ('Cliente');
+  ('Cliente'),
+  ('Gerente'),
+  ('Bodeguero');
 
 INSERT INTO
   categorias (nombre)
@@ -466,6 +468,24 @@ VALUES
     '22334455',
     true,
     3
+  ),
+  -- Gerente (id_rol = 4)
+  (
+    'Laura Gerente',
+    'gerente@levelup.com',
+    '$2b$12$1bFpX/tnn7LKPWEjJ5MR3uv4vd6TfzXYPvoPaUdaLFkUzpyfTFps2',
+    '99887766',
+    true,
+    4
+  ),
+  -- Bodeguero (id_rol = 5)
+  (
+    'Marcos Bodeguero',
+    'bodeguero@levelup.com',
+    '$2b$12$1bFpX/tnn7LKPWEjJ5MR3uv4vd6TfzXYPvoPaUdaLFkUzpyfTFps2',
+    '88776655',
+    true,
+    5
   );
 
 -- el trigger tgr_create_wallet_user crea las billeteras automáticamente

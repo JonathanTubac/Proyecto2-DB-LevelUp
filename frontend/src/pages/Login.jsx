@@ -30,9 +30,14 @@ export default function Login() {
             login(res.data);
 
             const { rol } = res.data.user;
-            if (rol === 'Administrador') navigate('/admin');
-            else if (rol === 'Empleado') navigate('/empleado');
-            else navigate('/cliente');
+            const roleHome = {
+                'Administrador': '/admin',
+                'Gerente':       '/admin',
+                'Empleado':      '/admin/purchases',
+                'Bodeguero':     '/admin/products',
+                'Cliente':       '/cliente',
+            };
+            navigate(roleHome[rol] ?? '/login');
 
         } catch (err) {
             setError(err.message);

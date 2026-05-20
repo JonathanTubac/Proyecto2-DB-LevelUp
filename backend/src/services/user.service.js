@@ -47,8 +47,13 @@ export const updateUser = async (id, { name, email, phone, role_id }) => {
 
 export const deleteUser = async (id) => {
     const user = await userRepo.findById(id);
-    if (!user) throw new NotFoundError('This user doesnt exist!')
+    if (!user) throw new NotFoundError('This user doesnt exist!');
+    return userRepo.deleteById(id);
+};
 
-    return userRepo.deleteById(id)
-}
+export const activateUser = async (id) => {
+    const user = await userRepo.findById(id);
+    if (!user) throw new NotFoundError('This user doesnt exist!');
+    return userRepo.activateById(id);
+};
 

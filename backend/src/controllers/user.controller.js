@@ -42,10 +42,18 @@ export const update = async (req, res, next) => {
 
 export const remove = async (req, res, next) => {
     try {
-        const id = req.params.id;
-        await userService.deleteUser(id);
-        res.status(204).send();
+        await userService.deleteUser(req.params.id);
+        res.json({ success: true });
     } catch (err) {
         next(err);
     }
-}
+};
+
+export const activate = async (req, res, next) => {
+    try {
+        await userService.activateUser(req.params.id);
+        res.json({ success: true });
+    } catch (err) {
+        next(err);
+    }
+};

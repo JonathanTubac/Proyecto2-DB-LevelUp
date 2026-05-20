@@ -44,10 +44,18 @@ export const updateById = async (req, res, next) => {
 
 export const deactivateById = async (req, res, next) => {
     try {
-        const { id } = req.params;
-        await providerService.deactivateProvider(id);
-        res.status(200).json({ success: true });
+        await providerService.deactivateProvider(req.params.id);
+        res.json({ success: true });
     } catch (err) {
         next(err);
     }
-}
+};
+
+export const activateById = async (req, res, next) => {
+    try {
+        await providerService.activateProvider(req.params.id);
+        res.json({ success: true });
+    } catch (err) {
+        next(err);
+    }
+};

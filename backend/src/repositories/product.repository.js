@@ -1,6 +1,6 @@
 import { pool } from "../config/db.js";
 
-export const findAll = async ({ limit, offset, category, name }) => {
+export const findAll = async ({ limit, offset, category, name, showAll = false }) => {
   const { rows } = await pool.query(`
     SELECT
       p.id, p.nombre, p.precio, p.stock, p.activo,
@@ -8,12 +8,12 @@ export const findAll = async ({ limit, offset, category, name }) => {
       COUNT(*) OVER() AS total
     FROM productos p
     JOIN categorias c ON c.id = p.id_categoria
-    WHERE p.activo = true
+    WHERE ($5::boolean = true OR p.activo = true)
       AND ($1::int IS NULL OR p.id_categoria = $1)
       AND ($2::text IS NULL OR p.nombre ILIKE '%' || $2 || '%')
     ORDER BY p.nombre
     LIMIT $3 OFFSET $4
-  `, [category ?? null, name ?? null, limit, offset]);
+  `, [category ?? null, name ?? null, limit, offset, showAll]);
 
   return {
     data: rows.map(({ total, ...p }) => p),
@@ -61,14 +61,12 @@ export const update = async (id, { name, price, stock, id_category }) => {
 };
 
 export const deactivate = async (id) => {
-  const { rows } = await pool.query(`
-        UPDATE productos
-        SET activo = false
-        WHERE id = $1
-    `, [id])
-
-  return rows[0]
+  await pool.query(`UPDATE productos SET activo = false WHERE id = $1`, [id]);
 };
+
+export const activate = async (id) => {
+  await pool.query(`UPDATE productos SET activo = true WHERE id = $1`, [id]);
+};;
 
 export const decreaseStock = async (client, id, cantidad) => {
   const { rows } = await client.query(`

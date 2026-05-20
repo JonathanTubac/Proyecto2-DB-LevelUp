@@ -2,8 +2,8 @@ import { useState, useEffect } from 'react';
 import AdminLayout from '../../components/AdminLayout';
 import Pagination from '../../components/Pagination';
 import Modal from '../../components/Modal';
-import { getProviders, createProvider, updateProvider, deactivateProvider } from '../../api/providers.api';
-import { Loader2, Truck, Plus, Pencil, PowerOff } from 'lucide-react';
+import { getProviders, createProvider, updateProvider, deactivateProvider, activateProvider } from '../../api/providers.api';
+import { Loader2, Truck, Plus, Pencil, PowerOff, Power } from 'lucide-react';
 import ConfirmModal from '../../components/ConfirmModal';
 import { useToast } from '../../context/ToastContext';
 
@@ -28,7 +28,7 @@ export default function Providers() {
         const timer = setTimeout(async () => {
             setLoading(true);
             try {
-                const res = await getProviders({ page, limit: 10, nombre: search || undefined });
+                const res = await getProviders({ page, limit: 10, nombre: search || undefined, showAll: true });
                 setProviders(res.data);
                 setPagination(res.pagination);
             } catch (err) {
@@ -70,11 +70,30 @@ export default function Providers() {
 
     const handleDeactivate = (id) => {
         setConfirm({
+            message: '¿Seguro que deseas desactivar este proveedor?',
+            confirmLabel: 'Desactivar',
             onConfirm: async () => {
                 setConfirm(null);
                 try {
                     await deactivateProvider(id);
                     showToast('Proveedor desactivado');
+                    refetch();
+                } catch (err) {
+                    showToast(err.message, 'error');
+                }
+            },
+        });
+    };
+
+    const handleActivate = (id) => {
+        setConfirm({
+            message: '¿Seguro que deseas reactivar este proveedor?',
+            confirmLabel: 'Reactivar',
+            onConfirm: async () => {
+                setConfirm(null);
+                try {
+                    await activateProvider(id);
+                    showToast('Proveedor reactivado');
                     refetch();
                 } catch (err) {
                     showToast(err.message, 'error');
@@ -132,9 +151,13 @@ export default function Providers() {
                                             >
                                                 <Pencil size={13} /> Editar
                                             </button>
-                                            {p.activo && (
+                                            {p.activo ? (
                                                 <button className="btn-danger" style={{ display: 'flex', alignItems: 'center', gap: '0.3rem' }} onClick={() => handleDeactivate(p.id)}>
                                                     <PowerOff size={13} /> Desactivar
+                                                </button>
+                                            ) : (
+                                                <button className="btn-secondary" style={{ display: 'flex', alignItems: 'center', gap: '0.3rem' }} onClick={() => handleActivate(p.id)}>
+                                                    <Power size={13} /> Reactivar
                                                 </button>
                                             )}
                                         </td>
@@ -149,9 +172,9 @@ export default function Providers() {
 
             {confirm && (
                 <ConfirmModal
-                    title="Desactivar proveedor"
-                    message="¿Seguro que deseas desactivar este proveedor?"
-                    confirmLabel="Desactivar"
+                    title="Confirmar acción"
+                    message={confirm.message}
+                    confirmLabel={confirm.confirmLabel}
                     onConfirm={confirm.onConfirm}
                     onClose={() => setConfirm(null)}
                 />
