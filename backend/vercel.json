@@ -6,7 +6,7 @@
       "use": "@vercel/node",
       "config": {
           "bundle": false,
-          "includeFiles": ["node_modules/swagger-ui-dist/**"]
+          "includeFiles": ["node_modules/swagger-ui-dist/**", "src/routes/*.js"]
       }
     }
   ],

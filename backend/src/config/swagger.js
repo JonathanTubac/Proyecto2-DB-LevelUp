@@ -1,4 +1,8 @@
 import swaggerJsdoc from 'swagger-jsdoc';
+import { fileURLToPath } from 'url';
+import { dirname, resolve } from 'path';
+
+const __dirname = dirname(fileURLToPath(import.meta.url));
 
 const options = {
     definition: {
@@ -101,7 +105,7 @@ const options = {
         },
     },
     // dónde busca los comentarios JSDoc
-    apis: ['./src/routes/*.js'],
+    apis: [resolve(__dirname, '../routes/*.js')],
 };
 
 export default swaggerJsdoc(options);
