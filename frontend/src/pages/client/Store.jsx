@@ -3,6 +3,7 @@ import ClientLayout from '../../components/client/ClientLayout';
 import Pagination from '../../components/Pagination';
 import { getProductsClient, getCategoriesClient } from '../../api/client.api';
 import { useCart } from '../../context/CartContext';
+import { useToast } from '../../context/ToastContext';
 import { usePagination } from '../../hooks/usePagination';
 
 const categoryIcons = {
@@ -24,6 +25,7 @@ export default function Store() {
     const [quantities, setQuantities] = useState({}); // cantidad por producto
 
     const { cart, addToCart } = useCart();
+    const { showToast } = useToast();
     const { page, goToPage, reset } = usePagination(1, 12);
 
     useEffect(() => {
@@ -155,6 +157,7 @@ export default function Store() {
                                                     onClick={() => {
                                                         addToCart(product, getQuantity(product.id));
                                                         setQuantities(prev => ({ ...prev, [product.id]: 1 }));
+                                                        showToast(`${product.nombre} agregado al carrito`, 'info');
                                                     }}
                                                 >
                                                     {maxQ <= 0 ? '✓ En carrito' : '+ Agregar'}

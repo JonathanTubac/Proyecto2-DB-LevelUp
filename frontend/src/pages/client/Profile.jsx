@@ -2,15 +2,15 @@ import { useState, useEffect } from 'react';
 import ClientLayout from '../../components/client/ClientLayout';
 import { getMyWallet, rechargeWallet } from '../../api/client.api';
 import { useAuth } from '../../hooks/useAuth';
+import { useToast } from '../../context/ToastContext';
 
 export default function Profile() {
     const { user } = useAuth();
+    const { showToast } = useToast();
     const [wallet, setWallet] = useState(null);
     const [amount, setAmount] = useState('');
     const [loading, setLoading] = useState(true);
     const [recharging, setRecharging] = useState(false);
-    const [success, setSuccess] = useState('');
-    const [error, setError] = useState('');
 
     const fetchWallet = async () => {
         try {
@@ -28,16 +28,14 @@ export default function Profile() {
     const handleRecharge = async (e) => {
         e.preventDefault();
         setRecharging(true);
-        setError('');
-        setSuccess('');
 
         try {
             await rechargeWallet(parseFloat(amount));
-            setSuccess(`¡Recarga de Q${amount} exitosa!`);
+            showToast(`¡Recarga de Q${amount} exitosa!`);
             setAmount('');
             fetchWallet();
         } catch (err) {
-            setError(err.message);
+            showToast(err.message, 'error');
         } finally {
             setRecharging(false);
         }
@@ -87,9 +85,6 @@ export default function Profile() {
                                 <p>Saldo disponible</p>
                                 <h2>Q{parseFloat(wallet?.monto ?? 0).toFixed(2)}</h2>
                             </div>
-
-                            {success && <div className="success-message" style={{ marginBottom: '1rem' }}>{success}</div>}
-                            {error && <div className="error-message" style={{ marginBottom: '1rem' }}>{error}</div>}
 
                             {/* montos rápidos */}
                             <div style={{ display: 'flex', gap: '0.5rem', marginBottom: '0.75rem', flexWrap: 'wrap' }}>

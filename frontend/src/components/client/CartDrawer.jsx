@@ -1,19 +1,18 @@
 import { useState } from 'react';
 import { useCart } from '../../context/CartContext';
+import { useToast } from '../../context/ToastContext';
 import { buyProducts } from '../../api/client.api';
 
 export default function CartDrawer({ onClose, walletBalance, onPurchaseSuccess }) {
     const { cart, removeFromCart, updateCantidad, clearCart, total } = useCart();
+    const { showToast } = useToast();
     const [buying, setBuying] = useState(false);
-    const [error, setError] = useState('');
-    const [success, setSuccess] = useState('');
 
     const canAfford = walletBalance >= total;
 
     const handleBuy = async () => {
         if (!canAfford) return;
         setBuying(true);
-        setError('');
 
         try {
             await buyProducts(
@@ -23,11 +22,11 @@ export default function CartDrawer({ onClose, walletBalance, onPurchaseSuccess }
                 }))
             );
 
-            setSuccess('¡Compra realizada con éxito!');
             clearCart();
             onPurchaseSuccess();
+            showToast('¡Compra realizada con éxito!');
         } catch (err) {
-            setError(err.message);
+            showToast(err.message, 'error');
         } finally {
             setBuying(false);
         }
@@ -44,9 +43,6 @@ export default function CartDrawer({ onClose, walletBalance, onPurchaseSuccess }
                 </div>
 
                 <div className="cart-drawer-body">
-                    {success && <div className="success-message">{success}</div>}
-                    {error && <div className="error-message">{error}</div>}
-
                     {cart.length === 0 ? (
                         <div className="empty-state" style={{ marginTop: '2rem' }}>
                             <p>🛒</p>
