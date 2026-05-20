@@ -9,7 +9,7 @@ const options = {
             description: 'API REST para la tienda LevelUp',
         },
         servers: [
-            { url: 'http://localhost:3000', description: 'Development' },
+            { url: process.env.VERCEL_URL ? `https://${process.env.VERCEL_URL}` : 'http://localhost:3000', description: 'API Server' },
         ],
         components: {
             securitySchemes: {
