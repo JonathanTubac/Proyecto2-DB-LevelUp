@@ -1,0 +1,148 @@
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+model Categorias {
+  id        Int         @id @default(autoincrement())
+  nombre    String      @db.VarChar(60)
+  productos Productos[]
+
+  @@map("categorias")
+}
+
+model Proveedores {
+  id     Int      @id @default(autoincrement())
+  nombre String   @db.VarChar(60)
+  activo Boolean  @default(true)
+  brinda Brinda[]
+
+  @@map("proveedores")
+}
+
+model Roles {
+  id       Int        @id @default(autoincrement())
+  nombre   String     @db.VarChar(100)
+  usuarios Usuarios[]
+
+  @@map("roles")
+}
+
+model Productos {
+  id           Int              @id @default(autoincrement())
+  nombre       String           @db.VarChar(60)
+  precio       Decimal          @db.Decimal(10, 2)
+  stock        Int?
+  activo       Boolean?         @default(true)
+  id_categoria Int
+  categoria    Categorias       @relation(fields: [id_categoria], references: [id])
+  brinda       Brinda[]
+  detalle      DetalleCompras[]
+
+  @@map("productos")
+}
+
+model Brinda {
+  id           Int         @id @default(autoincrement())
+  id_proveedor Int
+  id_producto  Int
+  cantidad     Int?
+  fecha        DateTime    @default(now()) @db.Timestamp(6)
+  proveedor    Proveedores @relation(fields: [id_proveedor], references: [id])
+  producto     Productos   @relation(fields: [id_producto], references: [id])
+
+  @@map("brinda")
+}
+
+model Usuarios {
+  id             Int             @id @default(autoincrement())
+  nombre         String          @db.VarChar(100)
+  correo         String          @db.VarChar(100)
+  password       String
+  telefono       String?         @db.VarChar(20)
+  activo         Boolean         @default(true)
+  id_rol         Int
+  rol            Roles           @relation(fields: [id_rol], references: [id])
+  billetera      Billeteras?
+  compras        Compras[]
+  empleado       Empleados?
+  refresh_tokens RefreshTokens[]
+
+  @@map("usuarios")
+}
+
+model Empleados {
+  carnet     Int       @id
+  sueldo     Decimal?  @db.Decimal(10, 2)
+  id_usuario Int       @unique
+  usuario    Usuarios  @relation(fields: [id_usuario], references: [id])
+  compras    Compras[]
+
+  @@map("empleados")
+}
+
+model Billeteras {
+  id             Int           @id @default(autoincrement())
+  monto          Decimal       @default(0) @db.Decimal(10, 2)
+  fecha_creacion DateTime      @default(now()) @db.Timestamp(6)
+  id_usuario     Int           @unique
+  usuario        Usuarios      @relation(fields: [id_usuario], references: [id])
+  movimientos    Movimientos[]
+
+  @@map("billeteras")
+}
+
+model Compras {
+  id          Int              @id @default(autoincrement())
+  tipo        String?          @db.VarChar(60)
+  fecha       DateTime         @default(now()) @db.Timestamp(6)
+  total       Decimal?         @db.Decimal(10, 2)
+  id_usuario  Int?
+  id_empleado Int?
+  usuario     Usuarios?        @relation(fields: [id_usuario], references: [id])
+  empleado    Empleados?       @relation(fields: [id_empleado], references: [carnet])
+  detalle     DetalleCompras[]
+  movimientos Movimientos[]
+
+  @@map("compras")
+}
+
+model DetalleCompras {
+  id_producto       Int
+  id_compra         Int
+  cantidad_producto Int?
+  precio_unitario   Decimal?  @db.Decimal(10, 2)
+  producto          Productos @relation(fields: [id_producto], references: [id])
+  compra            Compras   @relation(fields: [id_compra], references: [id])
+
+  @@id([id_producto, id_compra])
+  @@map("detallecompras")
+}
+
+model Movimientos {
+  id              Int        @id @default(autoincrement())
+  tipo            String?    @db.VarChar(60)
+  monto           Decimal?   @db.Decimal(10, 2)
+  fecha           DateTime?  @default(now()) @db.Timestamp(6)
+  id_compra       Int?
+  id_billetera    Int
+  balance_despues Float
+  compra          Compras?   @relation(fields: [id_compra], references: [id])
+  billetera       Billeteras @relation(fields: [id_billetera], references: [id])
+
+  @@map("movimientos")
+}
+
+model RefreshTokens {
+  id         Int      @id @default(autoincrement())
+  user_id    Int
+  token      String   @unique
+  created_at DateTime @default(now()) @db.Timestamp(6)
+  usuario    Usuarios @relation(fields: [user_id], references: [id])
+
+  @@map("refresh_tokens")
+}
