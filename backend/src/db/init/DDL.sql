@@ -378,7 +378,9 @@ EXCEPTION WHEN OTHERS THEN
 END;
 $$;
 
--- SP 5: Registrar suministro — transacción explícita con ROLLBACK
+-- SP 5: Registrar suministro — PROCEDURE con transacción explícita y ROLLBACK
+-- Nota: ROLLBACK/COMMIT en PROCEDURE requieren llamarse fuera de un bloque EXCEPTION
+-- (PostgreSQL no permite ROLLBACK dentro de manejadores de excepción/subtransacciones)
 CREATE OR REPLACE PROCEDURE sp_registrar_suministro(
     IN p_id_proveedor INT,
     IN p_id_producto  INT,
@@ -390,6 +392,7 @@ DECLARE
     v_proveedor_existe BOOLEAN;
     v_producto_existe  BOOLEAN;
 BEGIN
+    -- Validaciones previas: en caso de error se hace ROLLBACK explícito
     IF p_cantidad <= 0 THEN
         ROLLBACK;
         RAISE EXCEPTION 'La cantidad debe ser mayor a 0';
@@ -416,10 +419,6 @@ BEGIN
     VALUES (p_id_proveedor, p_id_producto, p_cantidad);
 
     COMMIT;
-
-EXCEPTION WHEN OTHERS THEN
-    ROLLBACK;
-    RAISE;
 END;
 $$;
 
