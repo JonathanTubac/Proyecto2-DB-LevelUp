@@ -16,50 +16,25 @@ A full-stack web application for managing a gaming store. It covers product cata
 
 ## Rubric Checklist (cc3062 Project 2)
 
-### I. Architecture & REST API — 35/35 pts
+> Each criterion is graded as passed or not passed — no partial credit. All criteria are mandatory. Maximum score: **100 points**.
+
+### I. Security & Roles — 55 pts
 
 | Criterion | Status | Pts |
 |---|---|---|
-| REST endpoints documented (Swagger/OpenAPI) | ✅ | 8 |
-| Full CRUD for ≥ 2 entities (products, categories, providers, users, purchases) | ✅ | 15 |
-| Correct HTTP error handling + JSON error responses | ✅ | 7 |
-| ≥ 1 data-aggregation endpoint (`/api/v1/dashboard`) | ✅ | 5 |
+| 5 roles defined in the DBMS with `CREATE ROLE` and granular permissions via `GRANT`/`REVOKE` | ✅ | 20 |
+| Role schema documented: name, accessible tables, permitted operations | ✅ | 10 |
+| Login/logout authentication with one working test user per role in the seed script | ✅ | 10 |
+| Routes and UI views protected according to the authenticated user's role | ✅ | 15 |
 
-### II. Frontend — React — 53/53 pts
-
-| Criterion | Status | Pts |
-|---|---|---|
-| React Router with ≥ 4 distinct routes (12 routes implemented) | ✅ | 8 |
-| Global state with React Context (`AuthContext`, `CartContext`) | ✅ | 8 |
-| `useState`, `useEffect`, and `useCallback`/`useMemo` | ✅ | 8 |
-| Complex state flow with `useReducer` (shopping cart) | ✅ | 8 |
-| Controlled forms with client-side validation | ✅ | 8 |
-| Visible report in UI with real data (Dashboard KPIs + tables) | ✅ | 8 |
-| Visible error handling for the user (toasts + messages) | ✅ | 5 |
-
-### III. Code Quality — 12/12 pts
+### II. Stored Procedures & ORM — 45 pts
 
 | Criterion | Status | Pts |
 |---|---|---|
-| Working ESLint (`eslint.config.js`) | ✅ | 5 |
-| ≥ 3 passing unit or integration tests | ✅ | 7 |
-
-### IV. Deployment & Delivery — 15/15 pts
-
-| Criterion | Status | Pts |
-|---|---|---|
-| README with working instructions + `docker compose up` | ✅ | 5 |
-| Project starts correctly with `docker compose up` | ✅ | 10 |
-
-### V. Advanced — 20/20 pts
-
-| Criterion | Status | Pts |
-|---|---|---|
-| Authentication with login/logout and session managed via Context | ✅ | 10 |
-| Export report to PDF from the UI | ✅ | 5 |
-| Responsive design verifiable on mobile and desktop | ✅ | 5 |
-
-> **Note:** The project is deployed to production on Vercel (see Live Demo section above).
+| At least 5 stored procedures invoked from the backend (not standalone scripts) | ✅ | 15 |
+| At least 1 stored procedure with IN/OUT parameters and exception handling | ✅ | 10 |
+| At least 1 explicit transaction with ROLLBACK inside a stored procedure | ✅ | 10 |
+| ORM configured and used in at least 3 CRUD operations | ✅ | 10 |
 
 ---
 
@@ -70,6 +45,7 @@ A full-stack web application for managing a gaming store. It covers product cata
 | Backend | Node.js + Express.js v5 |
 | Frontend | React v19 + Vite |
 | Database | PostgreSQL 16 |
+| ORM | Prisma v5 |
 | Auth | JWT (access + refresh tokens) |
 | Validation | Zod |
 | Security | Helmet, CORS, Rate Limiting |
@@ -80,21 +56,247 @@ A full-stack web application for managing a gaming store. It covers product cata
 
 ---
 
-## Features
+## I. Security & Roles
 
-**Admin role**
-- Dashboard with KPI metrics (total users, products, monthly sales, top product, active wallets, etc.)
-- Full CRUD for products, categories, providers, and users
-- Inventory management via supplier supply records
-- View and filter all purchases
-- Manage customer digital wallets
+### DBMS Roles
 
-**Client role**
-- Browse the store and add products to a shopping cart
-- Purchase with digital wallet balance
-- View purchase history
-- Generate a purchase report as a PDF
-- Profile management
+Five roles are defined at the PostgreSQL level using `CREATE ROLE` with granular permissions assigned via `GRANT` and `REVOKE`. Defined in `backend/src/db/init/DDL.sql`, created automatically when the database container initializes.
+
+| DBMS Role | App Role | Accessible Tables | Permitted Operations |
+|---|---|---|---|
+| `rol_admin` | Administrador | All tables and sequences | ALL (SELECT, INSERT, UPDATE, DELETE) |
+| `rol_gerente` | Gerente | All tables (SELECT); `usuarios`, `empleados`, `roles` (write) | SELECT all · INSERT/UPDATE on `compras`, `detallecompras` · ALL on `usuarios`, `empleados`, `roles` · **REVOKE DELETE** on `compras`, `detallecompras`, `movimientos` |
+| `rol_empleado` | Empleado | `productos`, `categorias`, `proveedores`, `compras`, `detallecompras`, `empleados`, `billeteras`, `usuarios` | SELECT all listed · ALL on `compras`, `detallecompras`, `movimientos`, `billeteras` · **REVOKE DELETE** on financial tables |
+| `rol_bodeguero` | Bodeguero | All tables (SELECT); `productos`, `proveedores`, `brinda` (write) | SELECT all · ALL on `productos`, `proveedores`, `brinda` · **REVOKE DELETE** on `productos`, `proveedores` |
+| `rol_cliente` | Cliente | `productos`, `categorias` (read); `compras`, `detallecompras`, `billeteras`, `movimientos` (own data) | SELECT on catalog · ALL on `compras`, `detallecompras`, `billeteras`, `movimientos` · **REVOKE DELETE** and **REVOKE UPDATE** on `movimientos` |
+
+### Authentication & Session
+
+- Login and logout are handled via JWT (access token 15 min + refresh token 7 days).
+- Tokens are stored in `AuthContext` (React Context) and sent as `Bearer` headers on every API request.
+- The backend `protect` middleware verifies the token and attaches the user (with role) to `req.user`.
+- The `authorize(...roles)` middleware checks `req.user.rol` against the allowed roles for each route.
+
+### Protected Routes
+
+Backend (`auth.middleware.js` — `authorize(...roles)`):
+
+| Route | Allowed Roles |
+|---|---|
+| `GET /api/v1/dashboard` | Administrador, Gerente |
+| `GET/POST/PUT/DELETE /api/v1/users` | Administrador, Gerente |
+| `GET/POST/PUT/DELETE /api/v1/products` | Administrador, Gerente, Empleado, Bodeguero |
+| `GET/POST/PUT/DELETE /api/v1/categories` | Administrador, Gerente, Bodeguero |
+| `GET/POST/PUT/DELETE /api/v1/providers` | Administrador, Gerente, Bodeguero |
+| `GET/POST/PUT /api/v1/provide` | Administrador, Gerente, Bodeguero |
+| `GET/POST /api/v1/purchases` | Administrador, Gerente, Empleado, Cliente |
+| `GET/PUT /api/v1/wallets` | Administrador, Gerente, Empleado, Cliente |
+
+Frontend (`ProtectedRoute` component + `App.jsx`):
+
+| Route | Allowed Roles |
+|---|---|
+| `/admin` (Dashboard) | Administrador, Gerente |
+| `/admin/users`, `/admin/wallets` | Administrador, Gerente |
+| `/admin/purchases` | Administrador, Gerente, Empleado |
+| `/admin/categories`, `/admin/providers` | Administrador, Gerente, Bodeguero |
+| `/admin/products` | Administrador, Gerente, Empleado, Bodeguero |
+| `/cliente/*` | Cliente |
+
+---
+
+## II. Stored Procedures & ORM
+
+### Stored Procedures
+
+All five procedures are defined in `backend/src/db/init/DDL.sql` and invoked from the backend through `backend/src/repositories/procedures.repository.js`. No procedure is called from a standalone SQL script.
+
+#### SP 1 — `sp_obtener_producto` (FUNCTION)
+
+Returns full product information via OUT parameters.
+
+```sql
+SELECT * FROM sp_obtener_producto(p_id);
+-- OUT: p_nombre, p_precio, p_stock, p_activo, p_categoria, p_id_categoria
+```
+
+Invoked from: `procedures.repository.js → spObtenerProducto(id)`
+
+---
+
+#### SP 2 — `sp_desactivar_producto` (FUNCTION — IN/OUT params + exception handling)
+
+Deactivates a product. Uses `IN` and `OUT` parameters and an `EXCEPTION WHEN OTHERS` block.
+
+```sql
+SELECT p_success, p_mensaje FROM sp_desactivar_producto(p_id);
+-- IN:  p_id INT
+-- OUT: p_success BOOLEAN, p_mensaje TEXT
+```
+
+Validates that the product exists and is currently active before updating. Returns `p_success = false` with a descriptive message on any failure; catches unexpected errors via `EXCEPTION WHEN OTHERS THEN`.
+
+Invoked from: `procedures.repository.js → spDesactivarProducto(id)` → `product.service.js → deactivateProduct()`
+
+---
+
+#### SP 3 — `sp_activar_producto` (FUNCTION — IN/OUT params + exception handling)
+
+Activates a product. Same IN/OUT + exception pattern as SP 2.
+
+```sql
+SELECT p_success, p_mensaje FROM sp_activar_producto(p_id);
+-- IN:  p_id INT
+-- OUT: p_success BOOLEAN, p_mensaje TEXT
+```
+
+Invoked from: `procedures.repository.js → spActivarProducto(id)` → `product.service.js → activateProduct()`
+
+---
+
+#### SP 4 — `sp_recargar_billetera` (FUNCTION — IN/OUT params + exception handling)
+
+Reloads a user's wallet balance. Validates amount > 0 and that the wallet exists before updating.
+
+```sql
+SELECT p_nuevo_saldo, p_success, p_mensaje FROM sp_recargar_billetera(p_id_usuario, p_monto);
+-- IN:  p_id_usuario INT, p_monto DECIMAL(10,2)
+-- OUT: p_nuevo_saldo DECIMAL(10,2), p_success BOOLEAN, p_mensaje TEXT
+```
+
+Invoked from: `procedures.repository.js → spRecargarBilletera(userId, amount)` → `wallet.service.js → rechargeWallet()`
+
+---
+
+#### SP 5 — `sp_registrar_suministro` (PROCEDURE — explicit transaction with ROLLBACK)
+
+Registers a supplier supply record. This is a `PROCEDURE` (not a FUNCTION), which allows explicit transaction control (`COMMIT` / `ROLLBACK`) in PostgreSQL.
+
+```sql
+CALL sp_registrar_suministro(p_id_proveedor, p_id_producto, p_cantidad);
+```
+
+**Transaction flow:**
+
+```
+validate cantidad > 0         → ROLLBACK + RAISE EXCEPTION if invalid
+validate proveedor is active  → ROLLBACK + RAISE EXCEPTION if not found
+validate producto is active   → ROLLBACK + RAISE EXCEPTION if not found
+INSERT INTO brinda(...)       -- trigger tgr_update_stock updates stock automatically
+COMMIT
+```
+
+On any validation failure, `ROLLBACK` is called explicitly before raising the exception. The trigger `tgr_update_stock` fires automatically after the INSERT to update the product's stock.
+
+Invoked from: `procedures.repository.js → spRegistrarSuministro(id_prov, id_prod, cantidad)` → `provide.service.js → createProvide()`
+
+---
+
+### ORM — Prisma v5
+
+**Configuration:** `backend/prisma/schema.prisma` maps all 11 database tables with relations. Binary targets include `linux-musl-openssl-3.0.x` for Docker (Alpine) and `native` for local/Vercel. The client is auto-generated via `postinstall: prisma generate`.
+
+**Client:** `backend/src/config/prisma.js` — singleton `PrismaClient` with the same `DATABASE_URL || individual-vars` fallback as the raw `pg` pool.
+
+The ORM replaces raw SQL in three entities:
+
+#### 1. Categories (`category.orm.repository.js`)
+
+| Operation | Prisma call |
+|---|---|
+| List (paginated + filter) | `prisma.categorias.findMany` + `prisma.categorias.count` |
+| Get by ID | `prisma.categorias.findUnique` |
+| Create | `prisma.categorias.create` |
+| Update | `prisma.categorias.update` |
+
+Used by: `category.service.js`
+
+#### 2. Providers (`provider.orm.repository.js`)
+
+| Operation | Prisma call |
+|---|---|
+| List (paginated + filter + showAll) | `prisma.proveedores.findMany` + `prisma.proveedores.count` |
+| Get by ID | `prisma.proveedores.findUnique` |
+| Create | `prisma.proveedores.create` |
+| Update | `prisma.proveedores.update` |
+| Deactivate / Activate | `prisma.proveedores.update` (`activo: false/true`) |
+
+Used by: `provider.service.js`
+
+#### 3. Products (`product.orm.repository.js`)
+
+| Operation | Prisma call |
+|---|---|
+| List (paginated + category + name + showAll) | `prisma.productos.findMany` + `prisma.productos.count` |
+| Get by ID | `prisma.productos.findUnique` |
+| Create | `prisma.productos.create` |
+| Update | `prisma.productos.update` |
+
+> Note: stock-decrement inside purchase transactions remains raw SQL (requires passing a `pg` client for transaction atomicity). Activate/deactivate are handled by SPs 2 and 3.
+
+Used by: `product.service.js`
+
+---
+
+## Test Credentials
+
+The seed script (`insercion.sql`) creates one functional user per database role. Password for all accounts:
+
+```
+Password!1
+```
+
+| Role | Email | Password |
+|---|---|---|
+| Administrador | admin@levelup.com | Password!1 |
+| Gerente | gerente@levelup.com | Password!1 |
+| Empleado | carlos@levelup.com | Password!1 |
+| Bodeguero | bodeguero@levelup.com | Password!1 |
+| Cliente | juan@gmail.com | Password!1 |
+
+Wallets are created automatically for every user via the database trigger `tgr_create_wallet_user`.
+
+---
+
+## Project Structure
+
+```
+LevelUp/
+├── backend/
+│   ├── prisma/
+│   │   └── schema.prisma         # Prisma schema (all 11 tables)
+│   └── src/
+│       ├── config/
+│       │   ├── db.js             # pg Pool + withTransaction helper
+│       │   └── prisma.js         # Prisma singleton client
+│       ├── repositories/
+│       │   ├── procedures.repository.js   # Invokes all 5 stored procedures
+│       │   ├── category.orm.repository.js # ORM — Categorias
+│       │   ├── provider.orm.repository.js # ORM — Proveedores
+│       │   ├── product.orm.repository.js  # ORM — Productos (basic CRUD)
+│       │   └── *.repository.js            # Raw SQL for other entities
+│       ├── services/             # Business logic
+│       ├── controllers/          # HTTP handlers
+│       ├── routes/               # Express routers + authorize() guards
+│       ├── middlewares/          # protect, authorize, error handler, logger
+│       └── db/
+│           └── init/
+│               ├── DDL.sql       # Schema + triggers + 5 stored procedures + roles
+│               └── insercion.sql # Seed data (one user per role)
+│
+├── frontend/
+│   └── src/
+│       ├── App.jsx               # ProtectedRoute guards per role
+│       ├── context/
+│       │   └── AuthContext.jsx   # JWT session management
+│       └── pages/
+│           ├── admin/            # Dashboard, Users, Products, Categories, Providers, Purchases, Wallets
+│           └── client/           # Store, Profile, MyPurchases, Report
+│
+├── docker-compose.yml
+├── .env.example
+└── README.md
+```
 
 ---
 
@@ -105,70 +307,17 @@ A full-stack web application for managing a gaming store. It covers product cata
 
 ---
 
-## Project Structure
-
-```
-LevelUp/
-├── backend/              # Express.js REST API
-│   ├── src/
-│   │   ├── config/       # DB and Swagger config
-│   │   ├── controllers/
-│   │   ├── repositories/ # Raw SQL queries
-│   │   ├── services/     # Business logic
-│   │   ├── routes/
-│   │   ├── middlewares/  # Auth, logging, validation, error handling
-│   │   ├── schemas/      # Zod schemas
-│   │   ├── utils/
-│   │   └── db/           # Database Dockerfile + SQL scripts
-│   ├── Dockerfile
-│   └── .env.example
-│
-├── frontend/             # React + Vite SPA
-│   ├── src/
-│   │   ├── pages/        # Admin and client pages
-│   │   ├── components/
-│   │   ├── context/      # AuthContext, CartContext
-│   │   ├── api/          # API client functions per resource
-│   │   └── hooks/
-│   ├── nginx.conf
-│   ├── Dockerfile
-│   └── .env.example
-│
-├── docker-compose.yml    # Orchestrates DB + API + Frontend
-├── .env.example          # Root env template for Docker
-└── README.md
-```
-
----
-
 ## Option 1 — Docker (recommended)
 
 This is the simplest way to run the entire stack (database, API, and frontend) with a single command.
+
 ### 1. Clone this repository
 
 ```bash
 git clone https://github.com/JonathanTubac/Proyecto2-DB-LevelUp.git
 ```
-### 2. Create the docker-compose.yml
 
-**Linux / macOS:**
-```bash
-cp docker-compose.yml.example docker-compose.yml
-```
-
-**Windows (PowerShell):**
-```powershell
-Copy-Item docker-compose.yml.example docker-compose.yml
-```
-
-**Windows (CMD):**
-```cmd
-copy docker-compose.yml.example docker-compose.yml
-```
-
-### 3. Create the root `.env` file
-
-Copy the example file and fill in your values:
+### 2. Create the root `.env` file
 
 **Linux / macOS:**
 ```bash
@@ -213,19 +362,19 @@ VITE_API_URL=http://localhost:3001/api/v1
 
 > **Important:** `DB_HOST` must stay as `postgres` (the Docker service name). Do not change it.
 
-### 4. Build and start
+### 3. Build and start
 
 ```bash
 docker compose up -d --build
 ```
 
 On the first run Docker will:
-1. Build the custom database image (PostgreSQL 16 + DDL + seed data)
-2. Build the backend image
+1. Build the custom database image (PostgreSQL 16 + DDL + seed data — including all stored procedures and DBMS roles)
+2. Build the backend image (runs `prisma generate` automatically)
 3. Build the frontend image (Nginx serving the React build)
 4. Wait for the database health check before starting the API
 
-### 5. Access the app
+### 4. Access the app
 
 | Service | URL |
 |---|---|
@@ -247,6 +396,7 @@ docker compose down -v
 ```
 
 ---
+
 ## Option 2 — Local Development
 
 Run each service manually. You need PostgreSQL 16 already installed and running.
@@ -266,27 +416,15 @@ psql -U your_user -d levelup -f backend/src/db/init/DDL.sql
 psql -U your_user -d levelup -f backend/src/db/init/insercion.sql
 ```
 
-### 2. Configure the backend
+This creates all tables, indexes, triggers, stored procedures, the `dashboard_metrics` view, and the five DBMS roles.
 
-**Linux / macOS:**
+### 2. Configure and start the backend
+
 ```bash
 cd backend
-cp .env.example .env
 ```
 
-**Windows (PowerShell):**
-```powershell
-cd backend
-Copy-Item .env.example .env
-```
-
-**Windows (CMD):**
-```cmd
-cd backend
-copy .env.example .env
-```
-
-Edit `backend/.env`:
+Create `backend/.env`:
 
 ```env
 PORT=3000
@@ -306,7 +444,7 @@ JWT_REFRESH_EXPIRES_IN=7d
 FRONTEND_URL=http://localhost:5173
 ```
 
-Install dependencies and start the dev server:
+Install dependencies (this also generates the Prisma client via `postinstall`):
 
 ```bash
 npm install
@@ -315,7 +453,7 @@ npm run dev
 
 The API will be available at `http://localhost:3000`.
 
-### 3. Configure the frontend
+### 3. Configure and start the frontend
 
 Open a new terminal:
 
@@ -329,34 +467,12 @@ Create `frontend/.env`:
 VITE_API_URL=http://localhost:3000/api/v1
 ```
 
-Install dependencies and start Vite:
-
 ```bash
 npm install
 npm run dev
 ```
 
 The frontend will be available at `http://localhost:5173`.
-
----
-
-## Test Credentials
-
-The seed script (`insercion.sql`) creates one functional user per database role. Password for all accounts:
-
-```
-Password!1
-```
-
-| Role | Email | Password |
-|---|---|---|
-| Administrador | admin@levelup.com | Password!1 |
-| Empleado | carlos@levelup.com | Password!1 |
-| Cliente | juan@gmail.com | Password!1 |
-| Gerente | gerente@levelup.com | Password!1 |
-| Bodeguero | bodeguero@levelup.com | Password!1 |
-
-Wallets are created automatically for every user via a database trigger (`tgr_create_wallet_user`).
 
 ---
 
@@ -375,44 +491,7 @@ Interactive Swagger documentation is available at `http://localhost:3000/api-doc
 | Purchases | `/api/v1/purchases` |
 | Wallets | `/api/v1/wallets` |
 | Dashboard | `/api/v1/dashboard` |
-| Health | `/api/v1/health` |
-
----
-
-## Database Schema (key tables)
-
-| Table | Description |
-|---|---|
-| `roles` | Admin / Employee / Client |
-| `usuarios` | Registered users with role |
-| `empleados` | Employee profile (ID card, salary) |
-| `productos` | Products with stock, price, category |
-| `categorias` | Product categories |
-| `proveedores` | Suppliers |
-| `brinda` | Supplier → Product supply records (updates stock via trigger) |
-| `compras` | Purchase orders |
-| `detalle_compras` | Line items per purchase |
-| `billeteras` | Digital wallet per user (auto-created on register) |
-| `movimientos` | Wallet transaction log |
-| `refresh_tokens` | JWT refresh token store |
-
-A `dashboard_metrics` view aggregates KPIs for the admin dashboard.
-
----
-
-## Database Roles (Proyecto 3)
-
-Five roles are defined at the PostgreSQL level using `CREATE ROLE` with granular permissions assigned via `GRANT` and `REVOKE`. These roles map to the five business user types of the store.
-
-| DBMS Role | App Role | Accessible Tables | Permitted Operations |
-|---|---|---|---|
-| `rol_admin` | Administrador | All tables and sequences | ALL (SELECT, INSERT, UPDATE, DELETE, TRUNCATE) |
-| `rol_gerente` | Gerente | All tables (SELECT); `usuarios`, `empleados`, `roles` (write) | SELECT all · INSERT/UPDATE on `compras`, `detallecompras` · ALL on `usuarios`, `empleados`, `roles` · **REVOKE DELETE** on `compras`, `detallecompras`, `movimientos` |
-| `rol_empleado` | Empleado | `productos`, `categorias`, `proveedores`, `compras`, `detallecompras`, `empleados`, `billeteras`, `usuarios` | SELECT all listed · ALL on `compras`, `detallecompras`, `movimientos`, `billeteras` · **REVOKE DELETE** on financial tables |
-| `rol_bodeguero` | Bodeguero | All tables (SELECT); `productos`, `proveedores`, `brinda` (write) | SELECT all · ALL on `productos`, `proveedores`, `brinda` · **REVOKE DELETE** on `productos`, `proveedores` |
-| `rol_cliente` | Cliente | `productos`, `categorias` (read); `compras`, `detallecompras`, `billeteras`, `movimientos` (own data) | SELECT on catalog · ALL on `compras`, `detallecompras`, `billeteras`, `movimientos` · **REVOKE DELETE** and **REVOKE UPDATE** on `movimientos` |
-
-> Roles are defined in `backend/src/db/init/DDL.sql` and are created automatically when the database container initializes.
+| Health | `/health` |
 
 ---
 
