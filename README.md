@@ -319,7 +319,24 @@ git clone https://github.com/JonathanTubac/Proyecto2-DB-LevelUp.git
 ```bash
 git checkout proyecto-3
 ```
-### 2. Create the root `.env` file
+### 2. Copy the `docker-compose.yml` file
+
+**Linux / macOS:**
+```bash
+cp docker-compose.yml.example docker-compose.yml
+```
+
+**Windows (PowerShell):**
+```powershell
+Copy-Item docker-compose.yml.example docker-compose.yml
+```
+
+**Windows (CMD):**
+```cmd
+copy docker-compose.yml.example docker-compose.yml
+```
+
+### 3. Create the root `.env` file
 
 **Linux / macOS:**
 ```bash
@@ -364,7 +381,7 @@ VITE_API_URL=http://localhost:3001/api/v1
 
 > **Important:** `DB_HOST` must stay as `postgres` (the Docker service name). Do not change it.
 
-### 3. Build and start
+### 4. Build and start
 
 ```bash
 docker compose up -d --build
@@ -376,7 +393,7 @@ On the first run Docker will:
 3. Build the frontend image (Nginx serving the React build)
 4. Wait for the database health check before starting the API
 
-### 4. Access the app
+### 5. Access the app
 
 | Service | URL |
 |---|---|
