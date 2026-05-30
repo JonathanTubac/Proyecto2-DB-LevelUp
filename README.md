@@ -14,7 +14,7 @@ A full-stack web application for managing a gaming store. It covers product cata
 
 ---
 
-## Rubric Checklist (cc3062 Project 2)
+## Rubric Checklist
 
 > Each criterion is graded as passed or not passed — no partial credit. All criteria are mandatory. Maximum score: **100 points**.
 
@@ -316,7 +316,9 @@ This is the simplest way to run the entire stack (database, API, and frontend) w
 ```bash
 git clone https://github.com/JonathanTubac/Proyecto2-DB-LevelUp.git
 ```
-
+```bash
+git checkout proyecto-3
+```
 ### 2. Create the root `.env` file
 
 **Linux / macOS:**
