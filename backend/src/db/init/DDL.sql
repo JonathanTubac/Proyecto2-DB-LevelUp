@@ -243,6 +243,185 @@ SELECT
   (SELECT COALESCE(SUM(monto), 0) FROM billeteras)
     AS saldo_total;
 
+-- ─── STORED PROCEDURES ─────────────────────────────────────────────────────
+
+-- SP 1: Obtener información completa de un producto por ID
+CREATE OR REPLACE FUNCTION sp_obtener_producto(
+    p_id         IN  INT,
+    p_nombre     OUT VARCHAR(60),
+    p_precio     OUT DECIMAL(10,2),
+    p_stock      OUT INT,
+    p_activo     OUT BOOLEAN,
+    p_categoria  OUT VARCHAR(60),
+    p_id_categoria OUT INT
+)
+RETURNS RECORD
+LANGUAGE plpgsql
+AS $$
+BEGIN
+    SELECT p.nombre, p.precio, p.stock, p.activo, c.nombre, p.id_categoria
+    INTO p_nombre, p_precio, p_stock, p_activo, p_categoria, p_id_categoria
+    FROM productos p
+    JOIN categorias c ON c.id = p.id_categoria
+    WHERE p.id = p_id;
+
+    IF NOT FOUND THEN
+        RAISE EXCEPTION 'Producto con id % no encontrado', p_id;
+    END IF;
+END;
+$$;
+
+-- SP 2: Desactivar producto — parámetros IN/OUT y manejo de excepciones
+CREATE OR REPLACE FUNCTION sp_desactivar_producto(
+    p_id      IN  INT,
+    p_success OUT BOOLEAN,
+    p_mensaje OUT TEXT
+)
+RETURNS RECORD
+LANGUAGE plpgsql
+AS $$
+BEGIN
+    IF NOT EXISTS(SELECT 1 FROM productos WHERE id = p_id) THEN
+        p_success := FALSE;
+        p_mensaje := 'Producto con id ' || p_id || ' no encontrado';
+        RETURN;
+    END IF;
+
+    IF NOT COALESCE((SELECT activo FROM productos WHERE id = p_id), FALSE) THEN
+        p_success := FALSE;
+        p_mensaje := 'El producto ya se encuentra inactivo';
+        RETURN;
+    END IF;
+
+    UPDATE productos SET activo = false WHERE id = p_id;
+
+    p_success := TRUE;
+    p_mensaje := 'Producto desactivado exitosamente';
+
+EXCEPTION WHEN OTHERS THEN
+    p_success := FALSE;
+    p_mensaje := 'Error al desactivar producto: ' || SQLERRM;
+END;
+$$;
+
+-- SP 3: Activar producto — parámetros IN/OUT y manejo de excepciones
+CREATE OR REPLACE FUNCTION sp_activar_producto(
+    p_id      IN  INT,
+    p_success OUT BOOLEAN,
+    p_mensaje OUT TEXT
+)
+RETURNS RECORD
+LANGUAGE plpgsql
+AS $$
+BEGIN
+    IF NOT EXISTS(SELECT 1 FROM productos WHERE id = p_id) THEN
+        p_success := FALSE;
+        p_mensaje := 'Producto con id ' || p_id || ' no encontrado';
+        RETURN;
+    END IF;
+
+    IF COALESCE((SELECT activo FROM productos WHERE id = p_id), FALSE) THEN
+        p_success := FALSE;
+        p_mensaje := 'El producto ya se encuentra activo';
+        RETURN;
+    END IF;
+
+    UPDATE productos SET activo = true WHERE id = p_id;
+
+    p_success := TRUE;
+    p_mensaje := 'Producto activado exitosamente';
+
+EXCEPTION WHEN OTHERS THEN
+    p_success := FALSE;
+    p_mensaje := 'Error al activar producto: ' || SQLERRM;
+END;
+$$;
+
+-- SP 4: Recargar billetera — parámetros IN/OUT y manejo de excepciones
+CREATE OR REPLACE FUNCTION sp_recargar_billetera(
+    p_id_usuario  IN  INT,
+    p_monto       IN  DECIMAL(10,2),
+    p_nuevo_saldo OUT DECIMAL(10,2),
+    p_success     OUT BOOLEAN,
+    p_mensaje     OUT TEXT
+)
+RETURNS RECORD
+LANGUAGE plpgsql
+AS $$
+BEGIN
+    IF p_monto <= 0 THEN
+        p_success     := FALSE;
+        p_mensaje     := 'El monto debe ser mayor a 0';
+        p_nuevo_saldo := NULL;
+        RETURN;
+    END IF;
+
+    IF NOT EXISTS(SELECT 1 FROM billeteras WHERE id_usuario = p_id_usuario) THEN
+        p_success     := FALSE;
+        p_mensaje     := 'Billetera no encontrada para el usuario ' || p_id_usuario;
+        p_nuevo_saldo := NULL;
+        RETURN;
+    END IF;
+
+    UPDATE billeteras
+       SET monto = monto + p_monto
+     WHERE id_usuario = p_id_usuario
+    RETURNING monto INTO p_nuevo_saldo;
+
+    p_success := TRUE;
+    p_mensaje := 'Recarga realizada exitosamente';
+
+EXCEPTION WHEN OTHERS THEN
+    p_success     := FALSE;
+    p_mensaje     := 'Error al recargar billetera: ' || SQLERRM;
+    p_nuevo_saldo := NULL;
+END;
+$$;
+
+-- SP 5: Registrar suministro — PROCEDURE con transacción explícita y ROLLBACK
+-- Nota: ROLLBACK/COMMIT en PROCEDURE requieren llamarse fuera de un bloque EXCEPTION
+-- (PostgreSQL no permite ROLLBACK dentro de manejadores de excepción/subtransacciones)
+CREATE OR REPLACE PROCEDURE sp_registrar_suministro(
+    IN p_id_proveedor INT,
+    IN p_id_producto  INT,
+    IN p_cantidad     INT
+)
+LANGUAGE plpgsql
+AS $$
+DECLARE
+    v_proveedor_existe BOOLEAN;
+    v_producto_existe  BOOLEAN;
+BEGIN
+    -- Validaciones previas: en caso de error se hace ROLLBACK explícito
+    IF p_cantidad <= 0 THEN
+        ROLLBACK;
+        RAISE EXCEPTION 'La cantidad debe ser mayor a 0';
+    END IF;
+
+    SELECT EXISTS(SELECT 1 FROM proveedores WHERE id = p_id_proveedor AND activo = true)
+      INTO v_proveedor_existe;
+
+    IF NOT v_proveedor_existe THEN
+        ROLLBACK;
+        RAISE EXCEPTION 'Proveedor con id % no encontrado o inactivo', p_id_proveedor;
+    END IF;
+
+    SELECT EXISTS(SELECT 1 FROM productos WHERE id = p_id_producto AND activo = true)
+      INTO v_producto_existe;
+
+    IF NOT v_producto_existe THEN
+        ROLLBACK;
+        RAISE EXCEPTION 'Producto con id % no encontrado o inactivo', p_id_producto;
+    END IF;
+
+    -- El trigger tgr_update_stock actualizará el stock automáticamente
+    INSERT INTO brinda(id_proveedor, id_producto, cantidad)
+    VALUES (p_id_proveedor, p_id_producto, p_cantidad);
+
+    COMMIT;
+END;
+$$;
+
 -- ─── ROLES OF DB ─────────────────────────────────────
 -- 5 roles with access by table and operation
 

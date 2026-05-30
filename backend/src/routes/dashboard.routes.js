@@ -4,6 +4,6 @@ import { protect, authorize } from '../middlewares/auth.middleware.js';
 
 const router = Router();
 
-router.get('/', protect, authorize('Administrador'), ctrl.getMetrics);
+router.get('/', protect, authorize('Administrador', 'Gerente'), ctrl.getMetrics);
 
 export default router;
