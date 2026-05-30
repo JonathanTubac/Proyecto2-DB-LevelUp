@@ -9,7 +9,7 @@ A full-stack web application for managing a gaming store. It covers product cata
 | Service | URL |
 |---|---|
 | Frontend | https://proyecto2-db-level-up-front.vercel.app |
-| Backend API | https://proyecto2-db-level-up-backend.vercel.app/api/v1 |
+| Backend API | https://proyecto2-db-level-up-backend.vercel.app/health |
 | Swagger Docs | https://proyecto2-db-level-up-backend.vercel.app/api-docs |
 
 ---
